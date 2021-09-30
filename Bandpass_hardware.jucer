@@ -2,16 +2,24 @@
 
 <JUCERPROJECT id="FaVHsK" name="Bandpass_hardware" projectType="audioplug"
               useAppConfig="0" addUsingNamespaceToJuceHeader="1" displaySplashScreen="1"
-              jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn">
+              jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
+              cppLanguageStandard="17">
   <MAINGROUP id="qrd2zy" name="Bandpass_hardware">
     <GROUP id="{B966DDC0-C521-C6FF-E16E-544DCDFF0026}" name="Source">
-      <FILE id="pbrMQS" name="PluginProcessor.cpp" compile="1" resource="0"
-            file="Source/PluginProcessor.cpp"/>
-      <FILE id="ZR8eeD" name="PluginProcessor.h" compile="0" resource="0"
-            file="Source/PluginProcessor.h"/>
-      <FILE id="tupC3A" name="PluginEditor.cpp" compile="1" resource="0"
+      <FILE id="uVXdXd" name="BandpassFilter.cpp" compile="1" resource="0"
+            file="Source/BandpassFilter.cpp"/>
+      <FILE id="vfm4SL" name="BandpassFilter.h" compile="0" resource="0"
+            file="Source/BandpassFilter.h"/>
+      <FILE id="c8H1qL" name="Envelope.cpp" compile="1" resource="0" file="Source/Envelope.cpp"/>
+      <FILE id="QR3qZi" name="Envelope.h" compile="0" resource="0" file="Source/Envelope.h"/>
+      <FILE id="Ua1dvS" name="FilterSynth.h" compile="0" resource="0" file="Source/FilterSynth.h"/>
+      <FILE id="kpRG8b" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
-      <FILE id="zEasac" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="QmdoxR" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="UHFS5X" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="pMBs8g" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
