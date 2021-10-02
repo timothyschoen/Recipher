@@ -4,15 +4,18 @@
 #include "Envelope.h"
 
 //Constructor class
-Envelope::Envelope(float attack, float decay, float sustain, float release, float sr) {
+Envelope::Envelope(float a, float d, float s, float r, float sr) {
     
-    adsr = {attack, decay, sustain, release};
+    attack = a;
+    decay = d;
+    sustain = s;
+    release = r;
     
     sample_rate = sr;
 
     increments[0] = calc_rate(1.0f, attack, sample_rate);
-    increments[1] = calc_rate(-1.0f, decay, sample_rate);
-    increments[2] = calc_rate(-sustain, release, sample_rate);
+    increments[1] = calc_rate(1.0f, decay, sample_rate) * -1.0f;
+    increments[2] = calc_rate(sustain, release, sample_rate) * -1.0f;
     
     target[1] = sustain;
     
@@ -56,40 +59,39 @@ float Envelope::tick() {
 }
 // Move to release phase immediately
 void Envelope::noteOff() {
-    auto& [a, d, s, r] = adsr;
     playing = true;
-    increments[2] = calc_rate(-level, r, sample_rate);
+    increments[2] = calc_rate(level, release, sample_rate) * -1.0f;
     state = 2;
 }
 //Note-on starts the Envelopee at the beginning again
-void Envelope::noteOn() {
+void Envelope::noteOn(float velocity) {
+    target[0] = velocity / 127.0f;
+    target[1] = (velocity / 127.0f) * sustain;
     playing = true;
     released = false;
     state = 0;
 }
-// Set out Envelope values
-//1/x leads to the correct increment we need when we poll every 1ms
-// Add a small number to make sure we never divide by 0!!! (infinite volume hurts your ears!)
-void Envelope::set_attack(float attack){
-    auto& [a, d, s, r] = adsr;
-    a = attack;
+
+void Envelope::set_attack(float a){
+    attack = a;
     increments[0] = calc_rate(1.0f, attack, sample_rate);
 }
-void Envelope::set_decay(float decay){
-    auto& [a, d, s, r] = adsr;
-    d = decay;
-    increments[1] = calc_rate(-1.0f, decay, sample_rate);
+
+void Envelope::set_decay(float d){
+    decay = d;
+    increments[1] = calc_rate(-1.0f, decay, sample_rate) * -1.0f;
 }
-void Envelope::set_sustain(float sustain){
-    auto& [a, d, s, r] = adsr;
-    s = sustain;
+
+void Envelope::set_sustain(float s){
+    sustain = s;
     target[1] = sustain;
 }
-void Envelope::set_release(float release){
-    auto& [a, d, s, r] = adsr;
-    r = release;
-    increments[2] = calc_rate(-s, release, sample_rate);
+
+void Envelope::set_release(float r){
+    release = r;
+    increments[2] = calc_rate(sustain, release, sample_rate) * -1.0f;;
 }
+
 // Check if the Envelopee is done, to see if the voice can be freed
 bool Envelope::getReleased() {
     return released;

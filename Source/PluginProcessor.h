@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <aubio/aubio.h>
 #include "FilterSynth.h"
 //==============================================================================
 /**
@@ -55,6 +56,12 @@ public:
 
     MidiKeyboardState keystate;
     FilterSynth filter_synth;
+    
+    fvec_t* phasevoc_in;
+    cvec_t* fftgrain;
+    fvec_t* phasevoc_out;
+    
+    aubio_pvoc_t* phase_vocoder[2];
     
 private:
     

@@ -6,8 +6,9 @@
 
 class Envelope {
   
-  std::tuple<float, float, float, float> adsr;
-    
+
+  float attack, decay, sustain, release;
+
   int state = 0;
   bool playing = false;
   float target[3] = {1, 0.3, 0};
@@ -26,7 +27,7 @@ public:
 
   void noteOff();
 
-  void noteOn();
+  void noteOn(float velocity);
 
   void set_attack(float value);
 

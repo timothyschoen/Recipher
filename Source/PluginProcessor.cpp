@@ -9,6 +9,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+
 //==============================================================================
 Bandpass_hardwareAudioProcessor::Bandpass_hardwareAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -94,6 +95,19 @@ void Bandpass_hardwareAudioProcessor::prepareToPlay (double sampleRate, int samp
     filter_synth.prepare({sampleRate, (uint32)samplesPerBlock, (uint32)getTotalNumOutputChannels()});
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    int hop_s = samplesPerBlock;
+    int win_s = samplesPerBlock * 4;
+    
+    phasevoc_in = new_fvec (hop_s); // input buffer
+    fftgrain = new_cvec (win_s); // fft norm and phase
+    phasevoc_out = new_fvec (hop_s); // output buffer
+    
+    phase_vocoder[0] = new_aubio_pvoc(win_s,hop_s);
+    phase_vocoder[1] = new_aubio_pvoc(win_s,hop_s);
+    
+    aubio_pvoc_set_window(phase_vocoder[0], "hanningz");
+    aubio_pvoc_set_window(phase_vocoder[1], "hanningz");
+    
 }
 
 void Bandpass_hardwareAudioProcessor::releaseResources()
@@ -154,6 +168,26 @@ void Bandpass_hardwareAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
     
     
     dsp::AudioBlock<float> in_block(buffer);
+    
+    for(int ch = 0; ch < buffer.getNumChannels(); ch++) {
+        
+        std::copy(in_block.getChannelPointer(ch), in_block.getChannelPointer(ch) + in_block.getNumSamples(), phasevoc_in->data);
+        
+        // execute phase vocoder
+        aubio_pvoc_do (phase_vocoder[ch], phasevoc_in, fftgrain);
+        
+        for(int bin = 0; bin < fftgrain->length; bin++) {
+            fftgrain->phas[bin] *= 0.5;
+        }
+
+        // optionally rebuild the signal
+        aubio_pvoc_rdo(phase_vocoder[ch], fftgrain, phasevoc_out);
+        
+        std::copy(phasevoc_out->data, phasevoc_out->data + in_block.getNumSamples(), in_block.getChannelPointer(ch));
+    }
+
+
+
     
     
     filter_synth.process(in_block, midiMessages);

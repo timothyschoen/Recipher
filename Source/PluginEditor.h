@@ -25,7 +25,7 @@ public:
     void resized() override;
     
     void handleNoteOn (MidiKeyboardState * keyState, int midiChannel, int midiNoteNumber,float velocity) override {
-        audioProcessor.filter_synth.note_on(midiNoteNumber, velocity);
+        audioProcessor.filter_synth.note_on(midiNoteNumber, velocity * 127.0f);
 
     }
 

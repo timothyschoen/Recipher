@@ -93,23 +93,33 @@ struct FilterSynth
         
         // TODO: check if same note is already playing somewhere
         
-        int voice_number;
-        bool found = false;
-        for(voice_number = 0; voice_number < num_voices; voice_number++){
-            if(filters[voice_number].envelope.getReleased())  {
-                found = true;
-                break;
-            }
-        }
+        auto note_iter = std::find_if(
+            active_voices.begin(), active_voices.end(), [midi_note](const std::tuple<float, float>& x) mutable {
+                return std::get<1>(x) == midi_note;
+                
+            });
         
-        // If we dont find a voice, steal the oldest voice
-        if(!found) {
-            voice_number = std::get<0>(active_voices[0]);
+        int voice_number;
+        if(note_iter != active_voices.end()) {
+            voice_number = std::get<0>(*note_iter);
+        }
+        else {
+            bool found = false;
+            for(voice_number = 0; voice_number < num_voices; voice_number++){
+                if(filters[voice_number].envelope.getReleased())  {
+                    found = true;
+                    break;
+                }
+            }
+            // If we dont find a voice, steal the oldest voice
+            if(!found) {
+                voice_number = std::get<0>(active_voices[0]);
+            }
         }
         
         active_voices.push_back({voice_number, midi_note});
         
-        filters[voice_number].note_on(mtof(midi_note));
+        filters[voice_number].note_on(mtof(midi_note), velocity);
     }
     
     void note_off(int midi_note, int velocity) {
@@ -128,7 +138,8 @@ struct FilterSynth
         if (m.isNoteOn())
         {
             int midi_note = m.getNoteNumber();
-            note_on(midi_note, 100);
+            float velocity = m.getVelocity();
+            note_on(midi_note, velocity);
         }
         else if (m.isNoteOff())
         {

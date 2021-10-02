@@ -40,10 +40,10 @@ struct BandpassFilter
         current_harmonics = shape_harmonics[(int)Shape::Sine].data();
     }
     
-    void note_on(float freq) {
+    void note_on(float freq, float velocity) {
         enabled = true;
         
-        envelope.noteOn();
+        envelope.noteOn(velocity);
         
         for(int h = 0; h < num_harmonics; h++) {
             float frequency = freq * (h + 1.0f);
