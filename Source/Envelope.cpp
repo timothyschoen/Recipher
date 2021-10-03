@@ -73,23 +73,23 @@ void Envelope::noteOn(float velocity) {
 }
 
 void Envelope::set_attack(float a){
-    attack = a;
+    attack = std::max(a, 1.0f);
     increments[0] = calc_rate(1.0f, attack, sample_rate);
 }
 
 void Envelope::set_decay(float d){
-    decay = d;
+    decay = std::max(d, 1.0f);
     increments[1] = calc_rate(-1.0f, decay, sample_rate) * -1.0f;
 }
 
 void Envelope::set_sustain(float s){
-    sustain = s;
+    sustain = std::max(s, 1.0f);
     target[1] = sustain;
 }
 
 void Envelope::set_release(float r){
     release = r;
-    increments[2] = calc_rate(sustain, release, sample_rate) * -1.0f;;
+    increments[2] = calc_rate(sustain, release, sample_rate) * -1.0f;
 }
 
 // Check if the Envelopee is done, to see if the voice can be freed

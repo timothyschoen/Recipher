@@ -30,7 +30,7 @@ public:
     }
 
     void handleNoteOff (MidiKeyboardState * keyState, int midiChannel, int midiNoteNumber,float velocity) override {
-        audioProcessor.filter_synth.note_off(midiNoteNumber, velocity);
+        audioProcessor.filter_synth.note_off(midiNoteNumber);
 
     }
 

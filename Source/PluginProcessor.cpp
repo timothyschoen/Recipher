@@ -108,6 +108,8 @@ void Bandpass_hardwareAudioProcessor::prepareToPlay (double sampleRate, int samp
     aubio_pvoc_set_window(phase_vocoder[0], "hanningz");
     aubio_pvoc_set_window(phase_vocoder[1], "hanningz");
     
+    interleaved_buffer.resize(samplesPerBlock * getTotalNumOutputChannels());
+    
 }
 
 void Bandpass_hardwareAudioProcessor::releaseResources()
@@ -183,14 +185,30 @@ void Bandpass_hardwareAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
         // optionally rebuild the signal
         aubio_pvoc_rdo(phase_vocoder[ch], fftgrain, phasevoc_out);
         
-        std::copy(phasevoc_out->data, phasevoc_out->data + in_block.getNumSamples(), in_block.getChannelPointer(ch));
+        //std::copy(phasevoc_out->data, phasevoc_out->data + in_block.getNumSamples(), in_block.getChannelPointer(ch));
     }
 
-
-
+    
+    // Interleave channels
+    for(int ch = 0; ch < 2; ch++) {
+        const auto* in_ptr = buffer.getReadPointer(ch);
+        for(int n = 0; n < buffer.getNumSamples(); n++) {
+            interleaved_buffer[n * 2 + ch] = in_ptr[n];
+        }
+    }
     
     
-    filter_synth.process(in_block, midiMessages);
+    filter_synth.process(interleaved_buffer, midiMessages);
+    
+    // De-interleave channels
+    for(int ch = 0; ch < 2; ch++) {
+        auto* out_ptr = buffer.getWritePointer(ch);
+        for(int n = 0; n < buffer.getNumSamples(); n++) {
+            out_ptr[n] = interleaved_buffer[n * 2 + ch];
+        }
+    }
+    
+    std::fill(interleaved_buffer.begin(), interleaved_buffer.end(), 0.0f);
 }
 
 //==============================================================================

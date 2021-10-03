@@ -12,6 +12,9 @@ enum class Shape: int
     NumShapes
 };
 
+using FilterState = std::tuple<float, float, float, float, std::array<float, 2>, std::array<float, 2>>;
+
+
 struct BandpassFilter
 {
     
@@ -23,17 +26,12 @@ struct BandpassFilter
         // Initialise harmonics for each shape
         for(int h = 0; h < num_harmonics; h++) {
             shape_harmonics[(int)Shape::Sine][h] = !h;
-            shape_harmonics[(int)Shape::Square][h] = (0.66f / (h + 1.0f)) * ((h + 1) & 1);
-            shape_harmonics[(int)Shape::Saw][h] = 0.5f / (h + 1.0f);
+            shape_harmonics[(int)Shape::Square][h] = (1.0f / (h + 1.0f)) * ((h + 1) & 1);
+            shape_harmonics[(int)Shape::Saw][h] = 1.0f / (h + 1.0f);
             
             // triangle is a square wave with the amplitude values squared
-            shape_harmonics[(int)Shape::Triangle][h] = 0.66f / (h + 1.0f) * ((h + 1) & 1);
+            shape_harmonics[(int)Shape::Triangle][h] = 1.0f / (h + 1.0f) * ((h + 1) & 1);
             shape_harmonics[(int)Shape::Triangle][h] *= shape_harmonics[(int)Shape::Triangle][h];
-            
-            
-            
-            svf_1[h].setType(dsp::StateVariableTPTFilterType::bandpass);
-            svf_2[h].setType(dsp::StateVariableTPTFilterType::bandpass);
         }
         
         set_q(6.05);
@@ -45,17 +43,20 @@ struct BandpassFilter
         
         envelope.noteOn(velocity);
         
-        for(int h = 0; h < num_harmonics; h++) {
-            float frequency = freq * (h + 1.0f);
+        for(int i = 0; i < num_harmonics; i++) {
+            float frequency = freq * (i + 1.0f);
             if(frequency > 20000) break;
             
-            svf_1[h].setCutoffFrequency(frequency);
-            svf_2[h].setCutoffFrequency(frequency);
+            auto& [g, h, R2, gain, s1, s2] = svf_1[i];
+            
+            g = std::tan (juce::MathConstants<float>::pi * frequency / 44100.0f);
+            h = 1.0f / (1.0f + R2 * g + g * g);
+            
+            svf_2[i] = svf_1[i];
         }
     }
     
     void note_off() {
-        
         envelope.noteOff();
         enabled = false;
     }
@@ -66,45 +67,56 @@ struct BandpassFilter
     }
     
     void set_q(float q) {
-        for(int h = 0; h < num_harmonics; h++) {
-            svf_1[h].setResonance(std::clamp(q, 0.0f, 20.0f));
-            svf_2[h].setResonance(std::clamp(q, 0.0f, 20.0f));
+        for(int i = 0; i < num_harmonics; i++) {
+            q = std::clamp(q, 0.0f, 20.0f);
+            
+            auto& [g, h, R2, gain, s1, s2] = svf_1[i];
+            R2 = 1.0f / q;
+            h  = 1.0f / (1.0f + R2 * g + g * g);
+            gain = R2;
+            
+            svf_2[i] = svf_1[i];
         }
     }
     
-    void prepare(dsp::ProcessSpec& spec) {
-        for(int h = 0; h < num_harmonics; h++) {
-            svf_1[h].prepare(spec);
-            svf_2[h].prepare(spec);
-        }
+    void process(const std::vector<float>& input, std::vector<float>& output) {
         
-        temp_buffer = AudioBuffer<float>(spec.numChannels, spec.maximumBlockSize);
-        temp_output = AudioBuffer<float>(spec.numChannels, spec.maximumBlockSize);
-    }
-    
-    void process(dsp::AudioBlock<float> input, dsp::AudioBlock<float> output) {
-       
+        static int num_channels = 2;
 
-        for(int n = 0; n < input.getNumSamples(); n++) {
+        for(int n = 0; n < input.size() / num_channels; n++) {
             float volume = envelope.tick();
             
             if(volume == 0.0f) continue;
             
-            for(int ch = 0; ch < input.getNumChannels(); ch++) {
-                const auto* in_ptr = input.getChannelPointer(ch);
-                auto* out_ptr = output.getChannelPointer(ch);
-  
+            for(int ch = 0; ch < num_channels; ch++) {
+                float in_sample = input[n * 2 + ch];
+                float& out_sample = output[n * 2 + ch];
+                
                 for(int h = 0; h < num_harmonics; h++) {
                     if(current_harmonics && current_harmonics[h]) {
-                        float filtered = svf_1[h].processSample(ch, in_ptr[n]);
-                        filtered = svf_2[h].processSample(ch, filtered);
-                        out_ptr[n] += filtered * volume;
+                        float filtered = apply_filter(ch, in_sample, svf_1[h]);
+                        filtered = apply_filter(ch, filtered, svf_2[h]);
+                        
+                        // Apply clipping distortion
+                        out_sample += tanh(filtered * volume);
                     }
                 }
-
+                
             }
         }
         
+    }
+    
+    float apply_filter(int ch, float input, FilterState& state) {
+        auto& [g, h, R2, gain, s1, s2] = state;
+
+        auto yHP = h * (input - s1[ch] * (g + R2) - s2[ch]);
+        auto yBP = yHP * g + s1[ch];
+        
+        s1[ch]      = yHP * g + yBP;
+        s2[ch]      = yBP * g + (yBP * g + s2[ch]);
+
+        return yBP * gain;
     }
     
     
@@ -113,14 +125,12 @@ struct BandpassFilter
     
     bool enabled = false;
     
-    AudioBuffer<float> temp_buffer, temp_output;
-    
     static constexpr int num_harmonics = 12;
     
     Envelope envelope = Envelope(500, 200, 0.4, 1000.0f, 44100.0f);
     
-    dsp::StateVariableTPTFilter<float> svf_1[num_harmonics];
-    dsp::StateVariableTPTFilter<float> svf_2[num_harmonics];
+    FilterState svf_1[num_harmonics];
+    FilterState svf_2[num_harmonics];
     
-    
+
 };

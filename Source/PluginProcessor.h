@@ -65,7 +65,7 @@ public:
     
 private:
     
-   
+    std::vector<float> interleaved_buffer;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Bandpass_hardwareAudioProcessor)

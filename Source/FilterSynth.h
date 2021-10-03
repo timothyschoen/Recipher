@@ -13,58 +13,51 @@ struct FilterSynth
     
 
     void prepare(dsp::ProcessSpec spec) {
-        for(auto& filter : filters) {
-            filter.prepare(spec);
-        }
-        
-        tempBuffer = AudioBuffer<float>(spec.numChannels, spec.maximumBlockSize);
+        temp_buffer.resize(spec.maximumBlockSize * spec.numChannels);
         sampleRate = spec.sampleRate;
     }
 
     // Copied from JUCE Synthesiser class
-    void process (dsp::AudioBlock<float> input, const MidiBuffer& midiData)
+    void process (std::vector<float>& input, const MidiBuffer& midiData)
     {
-        
-        int startSample = 0;
-        int numSamples = input.getNumSamples();
-        
         // must set the sample rate before using this!
         jassert (sampleRate != 0);
-        const int targetChannels = input.getNumChannels();
+        const int num_channels = 2;
 
-        auto midiIterator = midiData.findNextSamplePosition (startSample);
+        int start_sample = 0;
+        int num_samples = input.size() / num_channels;
+        auto midi_iterator = midiData.findNextSamplePosition (start_sample);
 
         bool firstEvent = true;
 
         const ScopedLock sl (lock);
 
-        for (; numSamples > 0; ++midiIterator)
+        for (; num_samples > 0; ++midi_iterator)
         {
-            if (midiIterator == midiData.cend())
+            if (midi_iterator == midiData.cend())
             {
-                if (targetChannels > 0) {
-                    process_filters(input, tempBuffer);
+                if (num_channels > 0) {
+                    process_filters(input, temp_buffer);
                 }
                     //renderVoices (outputAudio, startSample, numSamples);
-                input.clear();
-                input.copyFrom(tempBuffer);
-                tempBuffer.clear();
+                std::copy(temp_buffer.begin(), temp_buffer.begin() + input.size(), input.begin());
+                std::fill(temp_buffer.begin(), temp_buffer.end(), 0.0f);
                 return;
             }
 
-            const auto metadata = *midiIterator;
-            const int samplesToNextMidiMessage = metadata.samplePosition - startSample;
+            const auto metadata = *midi_iterator;
+            const int samples_to_next = metadata.samplePosition - start_sample;
 
-            if (samplesToNextMidiMessage >= numSamples)
+            if (samples_to_next >= num_samples)
             {
-                if (targetChannels > 0)
-                    process_filters(input, tempBuffer);
+                if (num_channels > 0)
+                    process_filters(input, temp_buffer);
 
                 handleMidiEvent (metadata.getMessage());
                 break;
             }
 
-            if (samplesToNextMidiMessage < ((firstEvent && ! subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
+            if (samples_to_next < ((firstEvent && ! subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
             {
                 handleMidiEvent (metadata.getMessage());
                 continue;
@@ -72,21 +65,20 @@ struct FilterSynth
 
             firstEvent = false;
 
-            if (targetChannels > 0)
-                process_filters(input, tempBuffer);
+            if (num_channels > 0)
+                process_filters(input, temp_buffer);
 
             handleMidiEvent (metadata.getMessage());
-            startSample += samplesToNextMidiMessage;
-            numSamples  -= samplesToNextMidiMessage;
+            start_sample += samples_to_next;
+            num_samples  -= samples_to_next;
         }
 
-        std::for_each (midiIterator,
+        std::for_each (midi_iterator,
                        midiData.cend(),
                        [&] (const MidiMessageMetadata& meta) { handleMidiEvent (meta.getMessage()); });
         
-        input.clear();
-        input.copyFrom(tempBuffer);
-        tempBuffer.clear();
+        std::copy(temp_buffer.begin(), temp_buffer.begin() + input.size(), input.begin());
+        std::fill(temp_buffer.begin(), temp_buffer.end(), 0.0f);
     }
     
     void note_on(int midi_note, int velocity) {
@@ -122,7 +114,7 @@ struct FilterSynth
         filters[voice_number].note_on(mtof(midi_note), velocity);
     }
     
-    void note_off(int midi_note, int velocity) {
+    void note_off(int midi_note) {
         int idx = 0;
         for(auto& [voice_number, note] : active_voices) {
             if(note == midi_note) {
@@ -144,6 +136,7 @@ struct FilterSynth
         else if (m.isNoteOff())
         {
             int midi_note = m.getNoteNumber();
+            note_off(midi_note);
 
         }
         else if (m.isAllNotesOff() || m.isAllSoundOff())
@@ -174,7 +167,7 @@ struct FilterSynth
         }
     }
     
-    void process_filters(dsp::AudioBlock<float> input, dsp::AudioBlock<float> output)
+    void process_filters(const std::vector<float>& input, std::vector<float>& output)
     {
         for(auto& filter : filters) {
             filter.process(input, output);
@@ -245,5 +238,5 @@ struct FilterSynth
     bool shouldStealNotes = true;
     BigInteger sustainPedalsDown;
     
-    AudioBuffer<float> tempBuffer;
+    std::vector<float> temp_buffer;
 };
