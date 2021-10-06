@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include <aubio/aubio.h>
 #include "FilterSynth.h"
+#include "PhaseVocoder.h"
 //==============================================================================
 /**
 */
@@ -54,18 +55,26 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void set_sample_speed(float stretch) {
+        phase_vocoder->set_stretch(stretch);
+    }
+
     MidiKeyboardState keystate;
     FilterSynth filter_synth;
     
-    fvec_t* phasevoc_in;
-    cvec_t* fftgrain;
-    fvec_t* phasevoc_out;
+    std::unique_ptr<PhaseVocoder> phase_vocoder;
     
-    aubio_pvoc_t* phase_vocoder[2];
+    dsp::DelayLine<float> delay_line = dsp::DelayLine<float>(88200);
     
+    LowpassFilter<2> lpf;
+    
+    Oscillator lfo;
+    int lfo_destination = 1;
+
 private:
     
-    std::vector<float> interleaved_buffer;
+    
+    std::vector<float> input_buffer;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Bandpass_hardwareAudioProcessor)

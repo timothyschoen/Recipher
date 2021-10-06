@@ -6,8 +6,12 @@
   ==============================================================================
 */
 
+
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+
+#include "AudioFile.h"
+
 
 
 //==============================================================================
@@ -21,6 +25,7 @@ Bandpass_hardwareAudioProcessor::Bandpass_hardwareAudioProcessor()
                        ), filter_synth(keystate)
 #endif
 {
+
 }
 
 Bandpass_hardwareAudioProcessor::~Bandpass_hardwareAudioProcessor()
@@ -92,23 +97,25 @@ void Bandpass_hardwareAudioProcessor::changeProgramName (int index, const juce::
 //==============================================================================
 void Bandpass_hardwareAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    filter_synth.prepare({sampleRate, (uint32)samplesPerBlock, (uint32)getTotalNumOutputChannels()});
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-    int hop_s = samplesPerBlock;
-    int win_s = samplesPerBlock * 4;
+    auto spec = dsp::ProcessSpec{sampleRate, (uint32)samplesPerBlock, (uint32)getTotalNumOutputChannels()};
     
-    phasevoc_in = new_fvec (hop_s); // input buffer
-    fftgrain = new_cvec (win_s); // fft norm and phase
-    phasevoc_out = new_fvec (hop_s); // output buffer
+    filter_synth.prepare(spec);
     
-    phase_vocoder[0] = new_aubio_pvoc(win_s,hop_s);
-    phase_vocoder[1] = new_aubio_pvoc(win_s,hop_s);
+    delay_line.prepare(spec);
+    delay_line.setDelay(22050);
     
-    aubio_pvoc_set_window(phase_vocoder[0], "hanningz");
-    aubio_pvoc_set_window(phase_vocoder[1], "hanningz");
+    input_buffer.resize(samplesPerBlock);
     
-    interleaved_buffer.resize(samplesPerBlock * getTotalNumOutputChannels());
+    AudioFile<float> in_file;
+    in_file.load("/Users/timschoen/Documents/Media/TestAudio/sample-44k.wav");
+    
+    auto sample_input = in_file.samples[0];
+    
+    phase_vocoder.reset(new PhaseVocoder(sampleRate, samplesPerBlock));
+    phase_vocoder->set_input_sample(sample_input);
+    
+    lfo.set_frequency(3.0f);
+    lfo.set_shape(0);
     
 }
 
@@ -160,55 +167,41 @@ void Bandpass_hardwareAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
         buffer.clear (i, 0, buffer.getNumSamples());
     
     
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
+    // LFO at control rate...
+    float lfo_value = lfo.tick();
+    for(int n = 0; n < buffer.getNumSamples(); n++) lfo.tick();
     
     
-    dsp::AudioBlock<float> in_block(buffer);
-    
-    for(int ch = 0; ch < buffer.getNumChannels(); ch++) {
-        
-        std::copy(in_block.getChannelPointer(ch), in_block.getChannelPointer(ch) + in_block.getNumSamples(), phasevoc_in->data);
-        
-        // execute phase vocoder
-        aubio_pvoc_do (phase_vocoder[ch], phasevoc_in, fftgrain);
-        
-        for(int bin = 0; bin < fftgrain->length; bin++) {
-            fftgrain->phas[bin] *= 0.5;
-        }
-
-        // optionally rebuild the signal
-        aubio_pvoc_rdo(phase_vocoder[ch], fftgrain, phasevoc_out);
-        
-        //std::copy(phasevoc_out->data, phasevoc_out->data + in_block.getNumSamples(), in_block.getChannelPointer(ch));
+    if(lfo_destination == 1) {
+        lpf.apply_modulation(lfo_value * 200);
     }
-
-    
-    // Interleave channels
-    for(int ch = 0; ch < 2; ch++) {
-        const auto* in_ptr = buffer.getReadPointer(ch);
-        for(int n = 0; n < buffer.getNumSamples(); n++) {
-            interleaved_buffer[n * 2 + ch] = in_ptr[n];
-        }
+    if(lfo_destination == 2) {
+       // delay_line.setDelay(float newDelayInSamples)
+        // add band delay!
     }
     
+    phase_vocoder->process(input_buffer.data(), buffer.getNumSamples());
     
-    filter_synth.process(interleaved_buffer, midiMessages);
+    filter_synth.process(input_buffer, midiMessages);
     
-    // De-interleave channels
-    for(int ch = 0; ch < 2; ch++) {
-        auto* out_ptr = buffer.getWritePointer(ch);
-        for(int n = 0; n < buffer.getNumSamples(); n++) {
-            out_ptr[n] = interleaved_buffer[n * 2 + ch];
-        }
+    lpf.process(input_buffer, input_buffer);
+    
+    for(int n = 0; n < buffer.getNumSamples(); n++) {
+        auto delayed = delay_line.popSample(0);
+        input_buffer[n] += delayed * 0.5;
+        delay_line.pushSample(0, input_buffer[n]);
+    }
+
+
+    // Fake stereo output
+    auto* l_ptr = buffer.getWritePointer(0);
+    auto* r_ptr = buffer.getWritePointer(1);
+    for(int n = 0; n < buffer.getNumSamples(); n++) {
+        l_ptr[n] = input_buffer[n];
+        r_ptr[n] = input_buffer[n];
     }
     
-    std::fill(interleaved_buffer.begin(), interleaved_buffer.end(), 0.0f);
+    std::fill(input_buffer.begin(), input_buffer.end(), 0.0f);
 }
 
 //==============================================================================

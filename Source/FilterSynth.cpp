@@ -1,7 +1,7 @@
 #include "FilterSynth.h"
 
 
-FilterSynth::FilterSynth (MidiKeyboardState& keyState)  : keyboardState (keyState)
+FilterSynth::FilterSynth (MidiKeyboardState& key_state)  : keyboard_state (key_state)
 {
     active_voices.reserve(num_voices);
 }
@@ -9,32 +9,29 @@ FilterSynth::FilterSynth (MidiKeyboardState& keyState)  : keyboardState (keyStat
 
 void FilterSynth::prepare(dsp::ProcessSpec spec) {
     temp_buffer.resize(spec.maximumBlockSize * spec.numChannels);
-    sampleRate = spec.sampleRate;
+    
 }
 
 
-void FilterSynth::process (std::vector<float>& input, const MidiBuffer& midiData)
+void FilterSynth::process (std::vector<float>& input, const MidiBuffer& midi_data)
 {
-    // must set the sample rate before using this!
-    jassert (sampleRate != 0);
-    const int num_channels = 2;
+    const int num_channels = 1;
     
     int start_sample = 0;
-    int num_samples = input.size() / num_channels;
-    auto midi_iterator = midiData.findNextSamplePosition (start_sample);
+    int num_samples = input.size();
+    auto midi_iterator = midi_data.findNextSamplePosition (start_sample);
     
-    bool firstEvent = true;
+    bool first_event = true;
     
     const ScopedLock sl (lock);
     
+    // MIDI handling from JUCE Synthesiser class
     for (; num_samples > 0; ++midi_iterator)
     {
-        if (midi_iterator == midiData.cend())
+        if (midi_iterator == midi_data.cend())
         {
-            if (num_channels > 0) {
-                process_filters(input, temp_buffer);
-            }
-            //renderVoices (outputAudio, startSample, numSamples);
+            process_filters(input, temp_buffer, start_sample, num_samples);
+            
             std::copy(temp_buffer.begin(), temp_buffer.begin() + input.size(), input.begin());
             std::fill(temp_buffer.begin(), temp_buffer.end(), 0.0f);
             return;
@@ -45,23 +42,21 @@ void FilterSynth::process (std::vector<float>& input, const MidiBuffer& midiData
         
         if (samples_to_next >= num_samples)
         {
-            if (num_channels > 0)
-                process_filters(input, temp_buffer);
+            process_filters(input, temp_buffer, start_sample, num_samples);
             
             handleMidiEvent (metadata.getMessage());
             break;
         }
         
-        if (samples_to_next < ((firstEvent && ! subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
+        if (samples_to_next < ((first_event && ! strict_subblocks) ? 1 : min_block_size))
         {
             handleMidiEvent (metadata.getMessage());
             continue;
         }
         
-        firstEvent = false;
+        first_event = false;
         
-        if (num_channels > 0)
-            process_filters(input, temp_buffer);
+        process_filters(input, temp_buffer,  start_sample,  samples_to_next);
         
         handleMidiEvent (metadata.getMessage());
         start_sample += samples_to_next;
@@ -69,7 +64,7 @@ void FilterSynth::process (std::vector<float>& input, const MidiBuffer& midiData
     }
     
     std::for_each (midi_iterator,
-                   midiData.cend(),
+                   midi_data.cend(),
                    [&] (const MidiMessageMetadata& meta) { handleMidiEvent (meta.getMessage()); });
     
     std::copy(temp_buffer.begin(), temp_buffer.begin() + input.size(), input.begin());
@@ -78,22 +73,21 @@ void FilterSynth::process (std::vector<float>& input, const MidiBuffer& midiData
 
 void FilterSynth::note_on(int midi_note, int velocity) {
     
-    // TODO: check if same note is already playing somewhere
+    // Check if note is already being played
+    auto note_iter = std::find_if(active_voices.begin(), active_voices.end(), [midi_note](const std::tuple<float, float>& x) mutable {
+        return std::get<1>(x) == midi_note;
+    });
     
-    auto note_iter = std::find_if(
-                                  active_voices.begin(), active_voices.end(), [midi_note](const std::tuple<float, float>& x) mutable {
-                                      return std::get<1>(x) == midi_note;
-                                      
-                                  });
-    
+    // If so, use the same voice number
     int voice_number;
     if(note_iter != active_voices.end()) {
         voice_number = std::get<0>(*note_iter);
     }
     else {
+        // Look for free voices
         bool found = false;
         for(voice_number = 0; voice_number < num_voices; voice_number++){
-            if(filters[voice_number].envelope.getReleased())  {
+            if(filters[voice_number].envelope.is_released())  {
                 found = true;
                 break;
             }
@@ -104,16 +98,24 @@ void FilterSynth::note_on(int midi_note, int velocity) {
         }
     }
     
+    // Save voice number for the note
     active_voices.push_back({voice_number, midi_note});
     
-    filters[voice_number].note_on(mtof(midi_note), velocity);
+    float freq = mtof(midi_note);
+    
+    // Send note on to filter
+    filters[voice_number].note_on(freq, velocity);
+    filters[voice_number].sub_osc.set_frequency(freq / 2.0f);
 }
 
 void FilterSynth::note_off(int midi_note) {
     int idx = 0;
+    // Find voice that is currently playing this note
     for(auto& [voice_number, note] : active_voices) {
         if(note == midi_note) {
+            // Send note-off
             filters[voice_number].note_off();
+            // Remove from active voices
             active_voices.erase(active_voices.begin() + idx);
             return;
         }
@@ -140,7 +142,7 @@ void FilterSynth::handleMidiEvent(MidiMessage m) {
     }
     else if (m.isPitchWheel())
     {
-        const int wheelPos = m.getPitchWheelValue();
+        //const int wheelPos = m.getPitchWheelValue();
         //lastPitchWheelValues [channel - 1] = wheelPos;
         //handlePitchWheel (channel, wheelPos);
     }
@@ -162,10 +164,10 @@ void FilterSynth::handleMidiEvent(MidiMessage m) {
     }
 }
 
-void FilterSynth::process_filters(const std::vector<float>& input, std::vector<float>& output)
+void FilterSynth::process_filters(const std::vector<float>& input, std::vector<float>& output, int start_sample, int num_samples)
 {
     for(auto& filter : filters) {
-        filter.process(input, output);
+        filter.process(input, output, start_sample, num_samples);
     }
 }
 
@@ -176,9 +178,9 @@ void FilterSynth::set_q(float q) {
     }
 }
 
-void FilterSynth::set_shape(int shape) {
+void FilterSynth::set_shape(float shape) {
     for(auto& filter : filters) {
-        filter.set_shape((Shape)shape);
+        filter.set_shape(shape);
     }
 }
 
@@ -207,3 +209,9 @@ void FilterSynth::set_release(float release) {
     }
 }
 
+void FilterSynth::set_sub(float sub) {
+    const ScopedLock sl (lock);
+    for(auto& filter : filters) {
+        filter.set_sub(sub);
+    }
+}

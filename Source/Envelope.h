@@ -25,9 +25,9 @@ public:
 
   float tick();
 
-  void noteOff();
+  void note_off();
 
-  void noteOn(float velocity);
+  void note_on(float velocity);
 
   void set_attack(float value);
 
@@ -38,10 +38,10 @@ public:
   void set_release(float value);
     
   // Calculate attack, decay and release constants
-  float calc_rate(float distance, float ms_time, double sr) {
+  float calc_rate(float distance, float ms_time, float sr) {
     return ms_time > 0.0f ? (float) (distance / ((ms_time / 1000.0f) * sr)) : -1.0f;
   }
 
   //Checks if voice is free
-  bool getReleased();
+  bool is_released();
 };
