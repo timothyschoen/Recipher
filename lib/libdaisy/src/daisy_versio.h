@@ -136,9 +136,6 @@ class DaisyVersio
     Switch        tap;
     GateIn        gate;
     Switch3       sw[SW_LAST];
-
-  private:
-    void SetHidUpdateRates();
 };
 
 } // namespace daisy

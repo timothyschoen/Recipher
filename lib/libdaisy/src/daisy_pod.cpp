@@ -81,27 +81,12 @@ void DaisyPod::Init(bool boost)
     InitEncoder();
     InitLeds();
     InitKnobs();
-    InitMidi();
     SetAudioBlockSize(48);
 }
 
 void DaisyPod::DelayMs(size_t del)
 {
     seed.DelayMs(del);
-}
-
-
-void DaisyPod::SetHidUpdateRates()
-{
-    encoder.SetUpdateRate(AudioCallbackRate());
-    for(int i = 0; i < KNOB_LAST; i++)
-    {
-        knobs[i]->SetSampleRate(AudioCallbackRate());
-    }
-    for(int i = 0; i < BUTTON_LAST; i++)
-    {
-        buttons[i]->SetUpdateRate(AudioCallbackRate());
-    }
 }
 
 void DaisyPod::StartAudio(AudioHandle::InterleavingAudioCallback cb)
@@ -132,7 +117,6 @@ void DaisyPod::StopAudio()
 void DaisyPod::SetAudioBlockSize(size_t size)
 {
     seed.SetAudioBlockSize(size);
-    SetHidUpdateRates();
 }
 
 size_t DaisyPod::AudioBlockSize()
@@ -143,7 +127,6 @@ size_t DaisyPod::AudioBlockSize()
 void DaisyPod::SetAudioSampleRate(SaiHandle::Config::SampleRate samplerate)
 {
     seed.SetAudioSampleRate(samplerate);
-    SetHidUpdateRates();
 }
 
 float DaisyPod::AudioSampleRate()
@@ -260,9 +243,4 @@ void DaisyPod::InitKnobs()
     {
         knobs[i]->Init(seed.adc.GetPtr(i), seed.AudioCallbackRate());
     }
-}
-void DaisyPod::InitMidi()
-{
-    MidiUartHandler::Config midi_config;
-    midi.Init(midi_config);
 }

@@ -11,7 +11,7 @@
 #include <JuceHeader.h>
 
 #include "FilterSynth.h"
-#include "PhaseVocoder.h"
+//#include "PhaseVocoder.h"
 #include "Processor.h"
 //==============================================================================
 /**

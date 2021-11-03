@@ -23,41 +23,15 @@ class AudioHandle
         ERR,
     };
 
-    /** Non-Interleaving input buffer
-     * Buffer arranged by float[chn][sample] 
-     * const so that the user can't modify the input
-    */
-    typedef const float* const* InputBuffer;
+    /** Non-Interleaving Callback format. Both arrays arranged by float[chn][sample] */
+    typedef void (*AudioCallback)(float** in, float** out, size_t size);
 
-    /** Non-Interleaving output buffer
-     * Arranged by float[chn][sample] 
-    */
-    typedef float** OutputBuffer;
-
-    /** Type for a Non-Interleaving audio callback 
-   * Non-Interleaving audio callbacks in daisy will be of this type
-  */
-    typedef void (*AudioCallback)(InputBuffer  in,
-                                  OutputBuffer out,
-                                  size_t       size);
-
-    /** Interleaving Input buffer
-     ** audio is prepared as { L0, R0, L1, R1, . . . LN, RN }]
-     ** this is const, as the user shouldn't modify it
-    */
-    typedef const float* InterleavingInputBuffer;
-
-    /** Interleaving Output buffer 
+    /** Non-Interleaving Callback format. 
      ** audio is prepared as { L0, R0, L1, R1, . . . LN, RN }
-    */
-    typedef float* InterleavingOutputBuffer;
-
-    /** Interleaving Audio Callback 
-   * Interleaving audio callbacks in daisy must be of this type
-  */
-    typedef void (*InterleavingAudioCallback)(InterleavingInputBuffer  in,
-                                              InterleavingOutputBuffer out,
-                                              size_t                   size);
+     */
+    typedef void (*InterleavingAudioCallback)(float* in,
+                                              float* out,
+                                              size_t size);
 
     AudioHandle() : pimpl_(nullptr) {}
     ~AudioHandle() {}
@@ -70,9 +44,6 @@ class AudioHandle
 
     /** Initializes audio to run using two SAI, each configured in Stereo I2S mode. */
     Result Init(const Config& config, SaiHandle sai1, SaiHandle sai2);
-
-    /** Stops and deinitializes audio. */
-    Result DeInit();
 
     /** Returns the Global Configuration struct for the Audio */
     const Config& GetConfig() const;

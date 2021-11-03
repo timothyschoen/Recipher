@@ -1,8 +1,6 @@
 #ifndef DSY_SYSTEM_H
 #define DSY_SYSTEM_H
 
-#ifndef UNIT_TEST // for unit tests, a dummy implementation is provided below
-
 #include <cstdint>
 #include "per/tim.h"
 
@@ -34,10 +32,9 @@ class System
          ** */
         void Defaults()
         {
-            cpu_freq    = SysClkFreq::FREQ_400MHZ;
-            use_dcache  = true;
-            use_icache  = true;
-            skip_clocks = false;
+            cpu_freq   = SysClkFreq::FREQ_400MHZ;
+            use_dcache = true;
+            use_icache = true;
         }
 
         /** Method to call on the struct to set to boost mode:
@@ -46,32 +43,14 @@ class System
          ** */
         void Boost()
         {
-            cpu_freq    = SysClkFreq::FREQ_480MHZ;
-            use_dcache  = true;
-            use_icache  = true;
-            skip_clocks = false;
+            cpu_freq   = SysClkFreq::FREQ_480MHZ;
+            use_dcache = true;
+            use_icache = true;
         }
 
         SysClkFreq cpu_freq;
         bool       use_dcache;
         bool       use_icache;
-        bool       skip_clocks;
-    };
-
-    /** Describes the different regions of memory available to the Daisy
-     * 
-     */
-    enum MemoryRegion
-    {
-        INTERNAL_FLASH = 0,
-        ITCMRAM,
-        DTCMRAM,
-        SRAM_D1,
-        SRAM_D2,
-        SRAM_D3,
-        SDRAM,
-        QSPI,
-        INVALID_ADDRESS,
     };
 
     System() {}
@@ -87,12 +66,6 @@ class System
      ** any necessary global inits.
      */
     void Init(const Config& config);
-
-    /** Deinitializer
-     ** Deinitializes all modules and peripherals 
-     ** set up with `Init`.
-     */
-    void DeInit();
 
     /** Jumps to the first address of the external flash chip (0x90000000)
      ** If there is no code there, the chip will likely fall through to the while() loop
@@ -127,13 +100,6 @@ class System
      ** \param delay_ticks Time to ddelay in microseconds */
     static void DelayTicks(uint32_t delay_ticks);
 
-    /** Triggers a reset of the seed and starts in bootloarder
-     ** mode to allow firmware update. */
-    static void ResetToBootloader();
-
-    /** Returns the tick rate in Hz with which GetTick() is incremented. */
-    static uint32_t GetTickFreq();
-
     /** Returns the Frequency of the system clock in Hz 
      ** This is the primary system clock that is used to generate
      ** AXI Peripheral, APB, and AHB clocks. */
@@ -162,27 +128,9 @@ class System
     static uint32_t GetPClk2Freq();
 
     /**
-     ** Returns a const reference to the Systems Configuration struct.
+     ** Returns a const reference to the Systems Configuration struct
      */
     const Config& GetConfig() const { return cfg_; }
-
-    /** Returns an enum representing the current (primary) memory space used 
-     *  for executing the program.
-     */
-    static MemoryRegion GetProgramMemoryRegion();
-
-    /** Returns an enum representing the the memory region 
-     *  that the given address belongs to.
-     *  \param address The address to be checked
-     */
-    static MemoryRegion GetMemoryRegion(uint32_t address);
-
-    /** This constant indicates the Daisy bootloader's offset from
-     *  the beginning of QSPI's address space. 
-     *  Data written within the first 256K will remain 
-     *  untouched by the Daisy bootloader.
-     */
-    static constexpr uint32_t kQspiBootloaderOffset = 0x40000U;
 
   private:
     void   ConfigureClocks();
@@ -193,71 +141,7 @@ class System
      ** Maybe this whole class should be static.. */
     static TimerHandle tim_;
 };
-} // namespace daisy
-
-#else // ifndef UNIT_TEST
-
-#include <cstdint>
-#include "../tests/TestIsolator.h"
-namespace daisy
-{
-/** This is a dummy implementation for use in unit tests.
- *  In your test, you can set the current system time to
- *  control the "flow of time" :-)
- *  Only the time-related functions are added here. If
- *  your tests need some of the other functions, feel
- *  free to add them here as well.
- * 
- *  To decouple tests that are running in parallel, each
- *  test can independently modify the current time.
- */
-class System
-{
-  public:
-    static uint32_t GetNow()
-    {
-        return testIsolator_.GetStateForCurrentTest()->currentUs_ / 1000;
-    }
-    static uint32_t GetUs()
-    {
-        return testIsolator_.GetStateForCurrentTest()->currentUs_;
-    }
-    static uint32_t GetTick()
-    {
-        return testIsolator_.GetStateForCurrentTest()->currentTick_;
-    }
-    static uint32_t GetTickFreq()
-    {
-        return testIsolator_.GetStateForCurrentTest()->tickFreqHz_;
-    }
-
-    /** Sets the current "tick" value for the test that's currently running. */
-    static void SetTickForUnitTest(uint32_t tick)
-    {
-        testIsolator_.GetStateForCurrentTest()->currentTick_ = tick;
-    }
-    /** Sets the current microsecond value for the test that's currently running. */
-    static void SetUsForUnitTest(uint32_t us)
-    {
-        testIsolator_.GetStateForCurrentTest()->currentUs_ = us;
-    }
-    /** Sets the tick frequency for the test that's currently running. */
-    static void SetTickFreqForUnitTest(uint32_t freqInHz)
-    {
-        testIsolator_.GetStateForCurrentTest()->tickFreqHz_ = freqInHz;
-    }
-
-  private:
-    struct SystemState
-    {
-        uint32_t currentTick_ = 0;
-        uint32_t currentUs_   = 0;
-        uint32_t tickFreqHz_  = 0;
-    };
-    static TestIsolator<SystemState> testIsolator_;
-};
 
 } // namespace daisy
 
-#endif // ifndef UNIT_TEST
 #endif

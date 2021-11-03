@@ -18,6 +18,7 @@ Envelope::Envelope(float a, float d, float s, float r, float sr) {
     target[1] = sustain;
 
     released = true;
+    releasing = false;
 }
 
 Envelope::~Envelope()
@@ -50,6 +51,8 @@ float Envelope::tick() {
         playing = false;
         level = 0.0f;
         released = true;
+        releasing = false;
+        on_release();
     }
 
     return level;
@@ -58,9 +61,11 @@ float Envelope::tick() {
 // Move to release phase immediately
 void Envelope::note_off() {
     playing = true;
+    releasing = true;
     increments[2] = calc_rate(level, release, sample_rate) * -1.0f;
     state = 2;
 }
+
 //Note-on starts the Envelopee at the beginning again
 void Envelope::note_on(float velocity) {
     velocity /= 127.0f;
@@ -72,6 +77,7 @@ void Envelope::note_on(float velocity) {
 
     playing = true;
     released = false;
+    releasing = false;
     state = 0;
 }
 
@@ -86,7 +92,7 @@ void Envelope::set_decay(float d){
 }
 
 void Envelope::set_sustain(float s){
-    sustain = std::fmax(s, 1.0f);
+    sustain = std::fmax(s, 0.01f);
     target[1] = sustain;
 }
 
@@ -99,3 +105,8 @@ void Envelope::set_release(float r){
 bool Envelope::is_released() {
     return released;
 }
+
+bool Envelope::is_releasing() {
+    return releasing;
+}
+

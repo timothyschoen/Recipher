@@ -25,8 +25,8 @@ struct SynthVoice
 
     SynthVoice();
 
-    void note_on(float freq, float velocity);
-
+    void note_on(int note, float velocity);
+    void retrigger(float velocity);
     void note_off();
 
     void set_shape(float shape);
@@ -36,20 +36,19 @@ struct SynthVoice
 
     void process(const std::vector<float>& input, std::vector<float>& output, int start_sample, int num_samples);
 
-    float apply_filter(float input, FilterState& state);
+    float apply_filter(float input, int c, int hr);
 
     void clear_filters();
 
     std::vector<float> current_harmonics;
-    Shape current_shape = Shape::Sine;
 
     float sub_level = 0.0f;
-    float feedback = 0.5f;
 
-    static constexpr int num_harmonics = 6;
-    static constexpr int cascade = 6;
 
-    Envelope envelope = Envelope(50, 1000, 0.2, 1000.0f, 44100.0f);
+    static constexpr int num_harmonics = 5;
+    static constexpr int cascade = 2;
+
+    Envelope envelope = Envelope(50.0f, 100.0f, 0.2f, 40.0f, 44100.0f);
 
     Oscillator sub_osc;
 
@@ -62,10 +61,14 @@ struct SynthVoice
         return targetRangeMin + value0To1 * (targetRangeMax - targetRangeMin);
     }
     
+    float ftom(float freq) { return 69.0f + 12.0f * log2(freq / 440.0f);     };
+    float mtof(float midi) { return pow(2, (midi - 69.0f) / 12.0f) * 440.0f; };
+    
+    int current_note = -1;
     
     // Filter variables
-    float g;
-    float h;
+    float g[num_harmonics];
+    float h[num_harmonics];
     float R2;
     float gain;
 };

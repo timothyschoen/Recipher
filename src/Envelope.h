@@ -1,4 +1,5 @@
 #include <cmath>
+#include <functional>
 #pragma once
 
 
@@ -12,6 +13,8 @@ class Envelope {
   float target[3] = {1, 0.3, 0};
   float increments[3] = {0.01, -0.2, -0.01};
   bool released;
+  bool releasing;
+
 
   float level = 0.0f;
 
@@ -42,4 +45,7 @@ public:
 
   //Checks if voice is free
   bool is_released();
+  bool is_releasing();
+    
+  std::function<void()> on_release = [](){};
 };

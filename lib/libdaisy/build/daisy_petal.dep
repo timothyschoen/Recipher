@@ -1,0 +1,249 @@
+build/src/daisy_petal.o: src/daisy_petal.cpp src/daisy_petal.h \
+ src/daisy_seed.h src/daisy.h \
+ /Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h \
+ /Applications/ARM/arm-none-eabi/include/stdint.h \
+ /Applications/ARM/arm-none-eabi/include/machine/_default_types.h \
+ /Applications/ARM/arm-none-eabi/include/sys/features.h \
+ /Applications/ARM/arm-none-eabi/include/_newlib_version.h \
+ /Applications/ARM/arm-none-eabi/include/sys/_intsup.h \
+ /Applications/ARM/arm-none-eabi/include/sys/_stdint.h src/daisy_core.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/stdlib.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdlib \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/c++config.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/os_defines.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/cpu_defines.h \
+ /Applications/ARM/arm-none-eabi/include/stdlib.h \
+ /Applications/ARM/arm-none-eabi/include/machine/ieeefp.h \
+ /Applications/ARM/arm-none-eabi/include/_ansi.h \
+ /Applications/ARM/arm-none-eabi/include/newlib.h \
+ /Applications/ARM/arm-none-eabi/include/sys/config.h \
+ /Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h \
+ /Applications/ARM/arm-none-eabi/include/sys/reent.h \
+ /Applications/ARM/arm-none-eabi/include/_ansi.h \
+ /Applications/ARM/arm-none-eabi/include/sys/_types.h \
+ /Applications/ARM/arm-none-eabi/include/machine/_types.h \
+ /Applications/ARM/arm-none-eabi/include/sys/lock.h \
+ /Applications/ARM/arm-none-eabi/include/sys/cdefs.h \
+ /Applications/ARM/arm-none-eabi/include/machine/stdlib.h \
+ /Applications/ARM/arm-none-eabi/include/alloca.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h \
+ src/sys/system.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdint src/per/tim.h \
+ src/per/qspi.h src/per/dac.h src/per/gpio.h src/dev/leddriver.h \
+ src/per/i2c.h src/dev/sdram.h src/dev/sr_4021.h src/sys/system.h \
+ src/hid/audio.h src/per/sai.h src/util/unique_id.h src/per/adc.h \
+ src/per/uart.h src/hid/midi.h src/util/ringbuffer.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/algorithm \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/utility \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_relops.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/move.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/type_traits \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/initializer_list \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_algobase.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/functexcept.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/exception_defines.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/cpp_type_traits.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/ext/type_traits.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/ext/numeric_traits.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_iterator_base_types.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_iterator_base_funcs.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/concept_check.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/debug/assertions.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_iterator.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/ptr_traits.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/debug/debug.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/predefined_ops.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_algo.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/algorithmfwd.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_heap.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_tempbuf.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_construct.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/new \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/exception \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/exception.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/exception_ptr.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/cxxabi_init_exception.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/typeinfo \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/hash_bytes.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/nested_exception.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/uniform_int_dist.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/limits \
+ src/hid/encoder.h src/hid/switch.h src/hid/switch3.h src/hid/ctrl.h \
+ src/hid/gatein.h src/hid/parameter.h src/hid/usb.h src/hid/logger.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cmath \
+ /Applications/ARM/arm-none-eabi/include/math.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdarg \
+ /Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stdarg.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdio \
+ /Applications/ARM/arm-none-eabi/include/stdio.h \
+ /Applications/ARM/arm-none-eabi/include/sys/types.h \
+ /Applications/ARM/arm-none-eabi/include/machine/endian.h \
+ /Applications/ARM/arm-none-eabi/include/machine/_endian.h \
+ /Applications/ARM/arm-none-eabi/include/sys/select.h \
+ /Applications/ARM/arm-none-eabi/include/sys/_sigset.h \
+ /Applications/ARM/arm-none-eabi/include/sys/_timeval.h \
+ /Applications/ARM/arm-none-eabi/include/sys/timespec.h \
+ /Applications/ARM/arm-none-eabi/include/sys/_timespec.h \
+ /Applications/ARM/arm-none-eabi/include/sys/_pthreadtypes.h \
+ /Applications/ARM/arm-none-eabi/include/sys/sched.h \
+ /Applications/ARM/arm-none-eabi/include/machine/types.h \
+ /Applications/ARM/arm-none-eabi/include/sys/stdio.h \
+ src/hid/logger_impl.h /Applications/ARM/arm-none-eabi/include/unistd.h \
+ /Applications/ARM/arm-none-eabi/include/sys/unistd.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cassert \
+ /Applications/ARM/arm-none-eabi/include/assert.h src/per/sdmmc.h \
+ src/per/spi.h src/hid/oled_display.h src/util/oled_fonts.h \
+ src/hid/wavplayer.h src/util/wav_format.h src/hid/led.h \
+ src/hid/rgb_led.h src/util/color.h src/dev/sr_595.h \
+ src/dev/codec_pcm3060.h src/dev/codec_wm8731.h src/dev/lcd_hd44780.h \
+ src/util/scopedirqblocker.h Drivers/CMSIS/Include/cmsis_gcc.h \
+ src/util/WaveTableLoader.h src/sys/fatfs.h \
+ Middlewares/Third_Party/FatFs/src/ff.h \
+ Middlewares/Third_Party/FatFs/src/integer.h src/sys/ffconf.h \
+ src/util/bsp_sd_diskio.h Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
+ Middlewares/Third_Party/FatFs/src/diskio.h \
+ Middlewares/Third_Party/FatFs/src/ff.h src/util/sd_diskio.h \
+ src/util/WavWriter.h
+src/daisy_petal.h:
+src/daisy_seed.h:
+src/daisy.h:
+/Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h:
+/Applications/ARM/arm-none-eabi/include/stdint.h:
+/Applications/ARM/arm-none-eabi/include/machine/_default_types.h:
+/Applications/ARM/arm-none-eabi/include/sys/features.h:
+/Applications/ARM/arm-none-eabi/include/_newlib_version.h:
+/Applications/ARM/arm-none-eabi/include/sys/_intsup.h:
+/Applications/ARM/arm-none-eabi/include/sys/_stdint.h:
+src/daisy_core.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/stdlib.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdlib:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/c++config.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/os_defines.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/cpu_defines.h:
+/Applications/ARM/arm-none-eabi/include/stdlib.h:
+/Applications/ARM/arm-none-eabi/include/machine/ieeefp.h:
+/Applications/ARM/arm-none-eabi/include/_ansi.h:
+/Applications/ARM/arm-none-eabi/include/newlib.h:
+/Applications/ARM/arm-none-eabi/include/sys/config.h:
+/Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h:
+/Applications/ARM/arm-none-eabi/include/sys/reent.h:
+/Applications/ARM/arm-none-eabi/include/_ansi.h:
+/Applications/ARM/arm-none-eabi/include/sys/_types.h:
+/Applications/ARM/arm-none-eabi/include/machine/_types.h:
+/Applications/ARM/arm-none-eabi/include/sys/lock.h:
+/Applications/ARM/arm-none-eabi/include/sys/cdefs.h:
+/Applications/ARM/arm-none-eabi/include/machine/stdlib.h:
+/Applications/ARM/arm-none-eabi/include/alloca.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h:
+src/sys/system.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdint:
+src/per/tim.h:
+src/per/qspi.h:
+src/per/dac.h:
+src/per/gpio.h:
+src/dev/leddriver.h:
+src/per/i2c.h:
+src/dev/sdram.h:
+src/dev/sr_4021.h:
+src/sys/system.h:
+src/hid/audio.h:
+src/per/sai.h:
+src/util/unique_id.h:
+src/per/adc.h:
+src/per/uart.h:
+src/hid/midi.h:
+src/util/ringbuffer.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/algorithm:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/utility:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_relops.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/move.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/type_traits:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/initializer_list:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_algobase.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/functexcept.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/exception_defines.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/cpp_type_traits.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/ext/type_traits.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/ext/numeric_traits.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_iterator_base_types.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_iterator_base_funcs.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/concept_check.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/debug/assertions.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_iterator.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/ptr_traits.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/debug/debug.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/predefined_ops.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_algo.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/algorithmfwd.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_heap.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_tempbuf.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/stl_construct.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/new:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/exception:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/exception.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/exception_ptr.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/cxxabi_init_exception.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/typeinfo:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/hash_bytes.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/nested_exception.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/uniform_int_dist.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/limits:
+src/hid/encoder.h:
+src/hid/switch.h:
+src/hid/switch3.h:
+src/hid/ctrl.h:
+src/hid/gatein.h:
+src/hid/parameter.h:
+src/hid/usb.h:
+src/hid/logger.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/cmath:
+/Applications/ARM/arm-none-eabi/include/math.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdarg:
+/Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stdarg.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdio:
+/Applications/ARM/arm-none-eabi/include/stdio.h:
+/Applications/ARM/arm-none-eabi/include/sys/types.h:
+/Applications/ARM/arm-none-eabi/include/machine/endian.h:
+/Applications/ARM/arm-none-eabi/include/machine/_endian.h:
+/Applications/ARM/arm-none-eabi/include/sys/select.h:
+/Applications/ARM/arm-none-eabi/include/sys/_sigset.h:
+/Applications/ARM/arm-none-eabi/include/sys/_timeval.h:
+/Applications/ARM/arm-none-eabi/include/sys/timespec.h:
+/Applications/ARM/arm-none-eabi/include/sys/_timespec.h:
+/Applications/ARM/arm-none-eabi/include/sys/_pthreadtypes.h:
+/Applications/ARM/arm-none-eabi/include/sys/sched.h:
+/Applications/ARM/arm-none-eabi/include/machine/types.h:
+/Applications/ARM/arm-none-eabi/include/sys/stdio.h:
+src/hid/logger_impl.h:
+/Applications/ARM/arm-none-eabi/include/unistd.h:
+/Applications/ARM/arm-none-eabi/include/sys/unistd.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/cassert:
+/Applications/ARM/arm-none-eabi/include/assert.h:
+src/per/sdmmc.h:
+src/per/spi.h:
+src/hid/oled_display.h:
+src/util/oled_fonts.h:
+src/hid/wavplayer.h:
+src/util/wav_format.h:
+src/hid/led.h:
+src/hid/rgb_led.h:
+src/util/color.h:
+src/dev/sr_595.h:
+src/dev/codec_pcm3060.h:
+src/dev/codec_wm8731.h:
+src/dev/lcd_hd44780.h:
+src/util/scopedirqblocker.h:
+Drivers/CMSIS/Include/cmsis_gcc.h:
+src/util/WaveTableLoader.h:
+src/sys/fatfs.h:
+Middlewares/Third_Party/FatFs/src/ff.h:
+Middlewares/Third_Party/FatFs/src/integer.h:
+src/sys/ffconf.h:
+src/util/bsp_sd_diskio.h:
+Middlewares/Third_Party/FatFs/src/ff_gen_drv.h:
+Middlewares/Third_Party/FatFs/src/diskio.h:
+Middlewares/Third_Party/FatFs/src/ff.h:
+src/util/sd_diskio.h:
+src/util/WavWriter.h:

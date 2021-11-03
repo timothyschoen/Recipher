@@ -17,11 +17,19 @@ SynthVoice::SynthVoice() {
         shape_harmonics[(int)Shape::Triangle][i] *= shape_harmonics[(int)Shape::Triangle][i];
     }
     
+    envelope.on_release = [this](){
+        current_note = -1;
+    };
+    
     set_q(6.05);
     set_shape(0.0f);
 }
 
-void SynthVoice::note_on(float freq, float velocity) {
+void SynthVoice::note_on(int note, float velocity) {
+    current_note = note;
+    float freq = mtof(note);
+    
+    sub_osc.set_frequency(freq / 2.0f);
     
     envelope.note_on(velocity);
     
@@ -29,9 +37,14 @@ void SynthVoice::note_on(float freq, float velocity) {
         float frequency = freq * (i + 1.0f);
         if(frequency > 20000) break;
         
-        g = std::tan (M_PI * frequency / 44100.0f);
-        h = 1.0f / (1.0f + R2 * g + g * g);
+        g[i] = std::tan (M_PI * frequency / 44100.0f);
+        h[i] = 1.0f / (1.0f + R2 * g[i] + g[i] * g[i]);
     }
+}
+
+void SynthVoice::retrigger(float velocity)
+{
+    envelope.note_on(velocity);
 }
 
 void SynthVoice::note_off() {
@@ -47,11 +60,9 @@ void SynthVoice::set_shape(float shape) {
     int high_shape = low_shape + 1;
     float distance = shape - low_shape;
     
-    for(int h = 0; h < num_harmonics; h++) {
-        current_harmonics[h] = map(distance, shape_harmonics[low_shape][h], shape_harmonics[high_shape][h]);
+    for(int hr = 0; hr < num_harmonics; hr++) {
+        current_harmonics[hr] = map(distance, shape_harmonics[low_shape][hr], shape_harmonics[high_shape][hr]);
     }
-    
-    //current_harmonics = shape_harmonics[(int)shape].data();
 }
 
 void SynthVoice::set_q(float q) {
@@ -60,7 +71,7 @@ void SynthVoice::set_q(float q) {
     for(int i = 0; i < num_harmonics; i++) {
         // Update filter variables
         R2 = 1.0f / q;
-        h  = 1.0f / (1.0f + R2 * g + g * g);
+        h[i]  = 1.0f / (1.0f + R2 * g[i] + g[i] * g[i]);
         gain = R2;
     }
 }
@@ -87,17 +98,17 @@ void SynthVoice::process(const std::vector<float>& input, std::vector<float>& ou
         
         out_sample += sub;
         
-        for(int h = 0; h < num_harmonics; h++) {
-            if(current_harmonics[h]) {
+        for(int hr = 0; hr < num_harmonics; hr++) {
+            if(current_harmonics[hr]) {
                 // Apply 2 cascaded filters
                 float filtered = in_sample;
                 
                 for(int c = 0; c < cascade; c++) {
-                    filtered = apply_filter(filtered, svf[c][h]);
+                    filtered = apply_filter(filtered, c, hr);
                 }
                 
                 // Apply clipping distortion
-                out_sample += tanh(filtered * volume * current_harmonics[h]);
+                out_sample += tanh(filtered * volume * current_harmonics[hr]);
             }
             
         }
@@ -122,7 +133,7 @@ void SynthVoice::clear_filters() {
     
     
 }
-float SynthVoice::apply_filter(float input, FilterState& state) {
+float SynthVoice::apply_filter(float input, int c, int hr) {
     
     /*
      An IIR filter band-pass filter with 12 dB of attenuation per octave, using a TPT structure, designed
@@ -131,13 +142,13 @@ float SynthVoice::apply_filter(float input, FilterState& state) {
      state variable filter circuit.
      */
     
-    auto& [s1, s2] = state;
+    auto& [s1, s2] = svf[c][hr];
     
-    auto yHP = h * (input - s1 * (g + R2) - s2);
-    auto yBP = yHP * g + s1;
+    auto yHP = h[hr] * (input - s1 * (g[hr] + R2) - s2);
+    auto yBP = yHP * g[hr] + s1;
     
-    s1      = yHP * g + yBP;
-    s2      = yBP * g + (yBP * g + s2);
+    s1      = yHP * g[hr] + yBP;
+    s2      = yBP * g[hr] + (yBP * g[hr] + s2);
     
     return yBP * gain;
 }

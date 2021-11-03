@@ -14,9 +14,12 @@ void FilterSynth::prepare(float sample_rate, int block_size) {
 
 void FilterSynth::process(std::vector<float>& input)
 {
-    int start_position = 0;
-    int idx = 0;
+
     
+    /*
+     int start_position = 0;
+     int idx = 0;
+     
     for(auto& [position, type, note, velocity] : message_queue) {
         
         int num_samples = position - start_position;
@@ -31,11 +34,16 @@ void FilterSynth::process(std::vector<float>& input)
         start_position += position;
         idx++;
         if(start_position > input.size()) break;
-    }
+    } */
     
-    int num_left = input.size() - start_position;
+    int num_samples = input.size();
     
-    process_filters(input, temp_buffer, start_position, num_left);
+    //process_filters(input, temp_buffer, start_position, num_samples);
+    
+    //int num_left = input.size() - start_position;
+    
+    process_filters(input, temp_buffer, 0, num_samples);
+    
     std::copy(temp_buffer.begin(), temp_buffer.begin() + input.size(), input.begin());
     std::fill(temp_buffer.begin(), temp_buffer.end(), 0.0f);
     
@@ -44,53 +52,51 @@ void FilterSynth::process(std::vector<float>& input)
 
 void FilterSynth::note_on(int midi_note, int velocity) {
     
+    //remove_duplicates(active_voices);
     // Check if note is already being played
-    auto note_iter = std::find_if(active_voices.begin(), active_voices.end(), [midi_note](const std::tuple<float, float>& x) mutable {
-        return std::get<1>(x) == midi_note;
-    });
     
-    // If so, use the same voice number
-    int voice_number;
-    if(note_iter != active_voices.end()) {
-        voice_number = std::get<0>(*note_iter);
-    }
-    else {
-        // Look for free voices
-        bool found = false;
-        for(voice_number = 0; voice_number < num_voices; voice_number++){
-            if(filters[voice_number].envelope.is_released())  {
-                found = true;
-                break;
-            }
-        }
-        // If we dont find a voice, steal the oldest voice
-        if(!found) {
-            voice_number = std::get<0>(active_voices[0]);
+        
+    for(int v = 0; v < num_voices; v++){
+        if(filters[v].current_note == midi_note) {
+            filters[v].retrigger(velocity);
+            return;
         }
     }
     
-    // Save voice number for the note
-    active_voices.push_back({voice_number, midi_note});
+    for(int v = 0; v < num_voices; v++){
+        if(filters[v].current_note == -1) {
+            // Send note on to filter
+            filters[v].note_on(midi_note, velocity);
+            active_voices.push_back(v);
+            return;
+        }
+    }
     
-    float freq = mtof(midi_note);
+    for(int v = 0; v < num_voices; v++){
+        if(filters[v].envelope.is_releasing()) {
+            filters[v].note_on(midi_note, velocity);
+            return;
+        }
+    }
     
-    // Send note on to filter
-    filters[voice_number].note_on(freq, velocity);
-    filters[voice_number].sub_osc.set_frequency(freq / 2.0f);
+    filters[active_voices[0]].note_on(midi_note, velocity);
+    std::rotate(active_voices.begin(), active_voices.begin() + 1, active_voices.end());
+    return;
 }
 
 void FilterSynth::note_off(int midi_note) {
-    int idx = 0;
     // Find voice that is currently playing this note
-    for(auto& [voice_number, note] : active_voices) {
-        if(note == midi_note) {
-            // Send note-off
-            filters[voice_number].note_off();
-            // Remove from active voices
-            active_voices.erase(active_voices.begin() + idx);
-            return;
+    for(int v = 0; v < num_voices; v++){
+        if(filters[v].current_note == midi_note) {
+            filters[v].note_off();
+            
+            for(int a = 0; a < active_voices.size(); a++) {
+                if(active_voices[a] == v) {
+                    active_voices.erase(active_voices.begin() + a);
+                }
+            }
+            
         }
-        idx++;
     }
 }
 

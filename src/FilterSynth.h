@@ -25,8 +25,20 @@ struct FilterSynth
     void note_off(int midi_note);
 
     void post_midi_message(MidiMess message) {
-        message_queue.push_back(message);
+        //message_queue.push_back(message);
     };
+    
+    void remove_duplicates(std::vector<std::pair<int, int>>& v) {
+        auto end = v.end();
+            for (auto it = v.begin(); it != end; ++it) {
+                end = std::remove_if(it + 1, end,
+                    [&it](std::pair<int, int> x){
+                        return x.second == it->second;
+                });
+            }
+        
+            v.erase(end, v.end());
+    }
 
 
     void process_filters(const std::vector<float>& input, std::vector<float>& output, int start_sample, int num_samples);
@@ -39,17 +51,16 @@ struct FilterSynth
     void set_sustain(float sustain);
     void set_release(float release);
 
+    
     void set_sub(float sub_level);
-
-    float ftom(float freq) { return 69.0f + 12.0f * log2(freq / 440.0f);     };
-    float mtof(float midi) { return pow(2, (midi - 69.0f) / 12.0f) * 440.0f; };
+    
 
     std::vector<MidiMess> message_queue;
 
     // Max num voices
-    static constexpr int num_voices = 8;
+    static constexpr int num_voices = 5;
 
-    std::vector<std::tuple<int, int>> active_voices;
+    std::vector<int> active_voices;
 
     // Synth voices
     SynthVoice filters[num_voices];

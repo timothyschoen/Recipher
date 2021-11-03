@@ -19,22 +19,6 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     
     p.keystate.addListener(this);
     
-    int edges[4] = {2, 3, 3, 1};
-    StringArray button_text = {"Sine", "Square", "Saw", "Triangle"};
-    
-    /*
-    for(int i = 0; i < 4; i++) {
-        auto& button = toggle_buttons[i];
-        addAndMakeVisible(button);
-        button.setClickingTogglesState(true);
-        button.setRadioGroupId(1001);
-        button.setButtonText(button_text[i]);
-        button.setConnectedEdges(edges[i]);
-        button.onClick = [this, i]() mutable {
-            audioProcessor.filter_synth.set_shape(i);
-        };
-    } */
-    
     shape_slider.setRange(0, 3);
     shape_slider.setValue(2.0f);
     shape_slider.onValueChange = [this]() {
@@ -90,7 +74,7 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     addAndMakeVisible(delay_time);
     
     delay_fb.setRange(0.0f, 0.98f);
-    delay_fb.setValue(1.0f);
+    delay_fb.setValue(0.3f);
     delay_fb.onValueChange = [this]() {
         audioProcessor.processor.set_delay_fb(delay_fb.getValue());
     };

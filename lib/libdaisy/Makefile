@@ -5,8 +5,10 @@ MODULE_DIR=src
 C_MODULES = \
 sys/dma \
 hid/audio \
+dev/sdram \
 sys/fatfs \
 per/gpio \
+per/qspi \
 per/sai \
 per/sdmmc \
 util/bsp_sd_diskio \
@@ -26,18 +28,18 @@ daisy_patch \
 daisy_petal \
 daisy_field \
 daisy_versio \
-daisy_patch_sm \
 sys/system \
 dev/sr_595 \
 dev/codec_ak4556 \
 dev/codec_pcm3060 \
 dev/codec_wm8731 \
 dev/lcd_hd44780 \
-dev/sdram \
 hid/ctrl \
 hid/encoder \
 hid/gatein \
 hid/led \
+hid/midi \
+hid/oled_display \
 hid/parameter \
 hid/rgb_led \
 hid/switch \
@@ -46,18 +48,11 @@ hid/wavplayer \
 hid/logger \
 per/adc \
 per/dac \
-per/gpio \
 per/i2c \
-per/rng \
-per/qspi \
 per/spi \
 per/tim \
 per/uart \
-ui/UI \
-ui/AbstractMenu \
-ui/FullScreenItemMenu \
 util/color \
-util/MappedValue \
 util/WaveTableLoader \
 
 ######################################
@@ -269,9 +264,7 @@ C_DEFS =  \
 -Dflash_layout \
 -DHSE_VALUE=16000000 \
 -DUSE_HAL_DRIVER \
--DUSE_FULL_LL_DRIVER \
--DDATA_IN_D2_SRAM 
-# ^ added for easy startup access
+-DUSE_FULL_LL_DRIVER 
 
 
 C_INCLUDES = \
@@ -288,8 +281,7 @@ C_INCLUDES = \
 -I$(MODULE_DIR) \
 -I. 
 
-# suppressions for warnings introduced by HAL/FatFS
-WARNINGS += -Wall -Wno-attributes -Wno-strict-aliasing -Wno-maybe-uninitialized -Wno-missing-attributes -Wno-stringop-overflow #-Werror
+WARNINGS += -Wall -Wno-attributes -Wno-strict-aliasing -Wno-maybe-uninitialized -Wno-missing-attributes #-Werror
 CPP_WARNINGS += -Wno-register
 
 # compile gcc flags
@@ -318,7 +310,7 @@ C_STANDARD = -std=gnu11
 CPP_STANDARD += -std=gnu++14
 
 # default action: build all
-all: $(BUILD_DIR)/$(TARGET).a
+all: $(BUILD_DIR)/$(TARGET).a 
 
 #######################################
 # build the application
@@ -347,7 +339,7 @@ $(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR)
 	mkdir -p $(@D)
-	$(AS) -c $(ASFLAGS) $< -o $@ -MD -MP -MF $(BUILD_DIR)/$(notdir $(<:.s =.dep))
+	$(AS) -c $(CFLAGS) $< -o $@ -MD -MP -MF $(BUILD_DIR)/$(notdir $(<:.s =.dep))
 
 $(BUILD_DIR)/$(TARGET).a: $(SORTED_OBJECTS) Makefile
 	$(AR) -r $@ $(SORTED_OBJECTS)

@@ -107,8 +107,8 @@ uint8_t UserRxBufferHS[APP_RX_DATA_SIZE];
 uint8_t UserTxBufferHS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
-CDC_ReceiveCallback rx_callback_fs = NULL;
-CDC_ReceiveCallback rx_callback_hs = NULL;
+CDC_ReceiveCallback rx_callback_fs;
+CDC_ReceiveCallback rx_callback_hs;
 void                dummy_rx_callback(uint8_t* buf, uint32_t* len)
 {
     // do nothing
@@ -177,8 +177,7 @@ static int8_t CDC_Init_FS(void)
     /* Set Application Buffers */
     USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
     USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
-    if (!rx_callback_fs)
-      rx_callback_fs = dummy_rx_callback;
+    rx_callback_fs = dummy_rx_callback;
     return (USBD_OK);
     /* USER CODE END 3 */
 }
@@ -320,8 +319,7 @@ static int8_t CDC_Init_HS(void)
     /* Set Application Buffers */
     USBD_CDC_SetTxBuffer(&hUsbDeviceHS, UserTxBufferHS, 0);
     USBD_CDC_SetRxBuffer(&hUsbDeviceHS, UserRxBufferHS);
-    if (!rx_callback_hs)
-      rx_callback_hs = dummy_rx_callback;
+    rx_callback_hs = dummy_rx_callback;
     return (USBD_OK);
     /* USER CODE END 8 */
 }
