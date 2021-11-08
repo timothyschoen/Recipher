@@ -36,6 +36,7 @@ struct Processor {
         delay_line.set_delay_samples(22050);
 
         input_buffer.resize(samplesPerBlock);
+        noise_buffer.resize(samplesPerBlock);
 
 #ifdef JUCE_API
         AudioFile<float> in_file;
@@ -45,42 +46,51 @@ struct Processor {
         //phase_vocoder->set_input_sample(sample_input);
 #endif
 
-
+        lfo.set_sample_rate(sampleRate / samplesPerBlock);
         lfo.set_frequency(3.0f);
         lfo.set_shape(0);
     }
 
     void process (float* input, int num_samples)  {
-
-        //audio_lock.lock();
-
         // LFO at control rate...
         float lfo_value = lfo.tick();
         //for(int n = 0; n < num_samples; n++) lfo.tick();
 
-        if(realtime_input) {
-            std::copy(input, input + num_samples, input_buffer.begin());
-        }
-        else {
-            // Create white noise
-            static auto generator = std::default_random_engine();  // Generates random integers
-            static auto distribution = std::uniform_real_distribution<float>(-0.999, +0.999);
-            auto gen = []() {
-                return distribution(generator);
-            };
+        std::copy(input, input + num_samples, input_buffer.begin());
 
-            // fill with random numbers
-            std::generate(input_buffer.begin(), input_buffer.end(), gen);
+        // Create white noise
+        static auto generator = std::default_random_engine();  // Generates random integers
+        static auto distribution = std::uniform_real_distribution<float>(-0.999, +0.999);
+        auto gen = []() {
+            return distribution(generator);
+        };
+
+        // fill with random numbers
+        std::generate(noise_buffer.begin(), noise_buffer.end(), gen);
+        for(int n = 0; n < num_samples; n++) {
+            input_buffer[n] *= input_gain;
+            input_buffer[n] = input_buffer[n] + noise_level * (noise_buffer[n] - input_buffer[n]);
+        }
         
-            //phase_vocoder->process(input, input_buffer.data(), num_samples);
-        }
+        std::function<void(float)> mod_targets[3] = {
+            [this](float mod){
+                filter_synth.set_shape_mod(mod * 3.0f);
+            },
+            [this](float mod){
+                lpf.apply_modulation(std::clamp(mod * 8000.0f, 1.0f, 20000.0f));
+        },  [this](float mod){
+            delay_line.apply_modulation(mod * 5000.0f);
+        }};
+        
+        int first_target = lfo_destination;
+        int second_target = first_target == 2 ? 0 : lfo_destination + 1;
+        float diff = lfo_destination - first_target;
 
-        if(lfo_destination == 1) {
-            lpf.apply_modulation(lfo_value * lfo_depth * 200);
-        }
-        if(lfo_destination == 2) {
-            delay_line.apply_modulation(lfo_value * lfo_depth * 200);
-        }
+        float mod_1 = lfo_value * lfo_depth * (1.0f - diff);
+        float mod_2 = lfo_value * lfo_depth * diff;
+        
+        mod_targets[first_target](mod_1);
+        mod_targets[second_target](mod_2);
         
         filter_synth.process(input_buffer);
 
@@ -91,50 +101,49 @@ struct Processor {
         std::copy(input_buffer.begin(), input_buffer.begin() + num_samples, input);
         std::fill(input_buffer.begin(), input_buffer.end(), 0.0f);
 
-        for(int n = 0; n < num_samples; n++) input[n] *= volume;
-    }
-
-
-    void note_on(int note, float velocity, int position) {
-        //filter_synth.note_on({position, 1, note, velocity});
-    }
-
-    void note_off(int note, int position) {
-       // filter_synth.post_midi_message({position, 0, note, 0});
-    }
-
-    void set_sample_speed(float stretch) {
-        //audio_lock.lock();
-        //phase_vocoder->set_stretch(stretch);
-        //audio_lock.unlock();
+        for(int n = 0; n < num_samples; n++) input[n] = (tanh(input[n] * drive) * (1.0f / sqrt(drive))) * volume;
     }
 
     void set_lfo_freq(float new_freq) {
-        //audio_lock.lock();
         lfo.set_frequency(new_freq);
-        //audio_lock.unlock();
     }
 
     void set_lfo_depth(float new_depth) {
-        //audio_lock.lock();
         lfo_depth = new_depth;
-        //audio_lock.unlock();
+    }
+    
+    void set_lfo_shape(int shape) {
+        lfo.set_shape(shape);
+    }
+    void set_lfo_dest(float destination) {
+        lfo_destination = destination;
     }
 
     void set_delay_time(int samples) {
-        //audio_lock.lock();
         delay_line.set_delay_samples(samples);
-        //audio_lock.unlock();
     }
 
     void set_delay_fb(float fb) {
-        //audio_lock.lock();
         delay_line.set_feedback(fb);
-        //audio_lock.unlock();
     }
     
-    void set_volume(float lvl) { volume = lvl; }
-
+    void set_volume(float lvl) {
+        volume = lvl;
+        
+    }
+    
+    void set_mix(float mix) {
+        noise_level = mix;
+    }
+    
+    void set_gain(float gain) {
+        input_gain = gain;
+    }
+    
+    void set_drive(float gain) {
+        drive = gain;
+    }
+    
     FilterSynth filter_synth;
 
     Delay<11025> delay_line;
@@ -144,14 +153,15 @@ struct Processor {
     Oscillator lfo;
 
     float lfo_depth = 0.2;
-    int lfo_destination = 1;
+    float lfo_destination = 1;
     
     float volume = 0.6f;
-
-   // std::mutex audio_lock;
+    float noise_level = 0.2;
+    float drive = 1.0f;
+    float input_gain = 1.0f;
 
 private:
 
-    std::vector<float> input_buffer;
+    std::vector<float> input_buffer, noise_buffer;
     //float input_buffer[BUFFER_SIZE];
 };

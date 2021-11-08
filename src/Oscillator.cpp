@@ -1,6 +1,10 @@
 #include <cmath>
 #include "Oscillator.h"
 
+void Oscillator::set_sample_rate(float sr)
+{
+    sample_rate = sr;
+}
 
 void Oscillator::set_frequency(float freq) {
     frequency = freq;
@@ -30,11 +34,18 @@ float Oscillator::triangle() {
 float Oscillator::tick() {
     phase += frequency / sample_rate;
     if(phase >= 1) phase = phase - 1;
-
-    return (this->*shapePointers[shape])();
+    
+    int first_shape = shape;
+    int second_shape = shape == 3 ? 3 : shape + 1;
+    float mix = shape - first_shape;
+    
+    float first_value = (this->*shapePointers[first_shape])();
+    float second_value = (this->*shapePointers[second_shape])();
+    
+    return (first_value + mix * (second_value - first_value)) * 0.5f;
 }
 
 // Move phase value to the next sample
-void Oscillator::set_shape(int shp) {
+void Oscillator::set_shape(float shp) {
     shape = shp;
 }

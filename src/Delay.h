@@ -26,15 +26,15 @@ struct Delay
         
         std::copy(input.begin(), input.end(), input_buffer.begin());
         for(int n = 0; n < input.size(); n++) {
-            float final_delay = std::clamp(delay_samples + modulation, 0.0f, (float)buffer_size);
+            float final_delay = std::clamp(delay_samples + modulation, 0.0f, ((float)buffer_size) - 1.0f);
             final_delay = std::max(smoother.process_sample(final_delay), 1.0f);
             
             float delay_frac = final_delay - (int)final_delay;
             
             // Read with linear interpolation
-            //output[n] = map(delay_frac, delay_buffer[wrap(write_pos + final_delay)], delay_buffer[wrap((write_pos + final_delay) + 1.0f)]);
+            output[n] = map(delay_frac, delay_buffer[wrap(write_pos + final_delay)], delay_buffer[wrap((write_pos + final_delay) + 1.0f)]);
             
-            output[n] = delay_buffer[wrap(write_pos + final_delay)];
+            //output[n] = delay_buffer[wrap(write_pos + final_delay)];
             
             delay_buffer[write_pos] = (input_buffer[n] + output[n]) * feedback;
             

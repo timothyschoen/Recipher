@@ -12,13 +12,14 @@ public:
     // Move phase value to the next sample
     float tick();
 
-    void set_shape(int shp);
+    void set_shape(float shp);
 
     void set_frequency(float freq);
 
+    void set_sample_rate(float sr);
 
 private:
-    int shape = 0;
+    float shape = 0;
 
     float frequency = 1.0f;
     float sample_rate = 44100.0f;
@@ -31,6 +32,6 @@ private:
     float triangle();
 
     //Pointers to the waveshape generators
-    float (Oscillator::*shapePointers[4])() = {&Oscillator::sine, &Oscillator::sawtooth, &Oscillator::square, &Oscillator::triangle};
+    float (Oscillator::*shapePointers[4])() = {&Oscillator::sine, &Oscillator::triangle, &Oscillator::square, &Oscillator::sawtooth};
 
 };

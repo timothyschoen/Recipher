@@ -165,6 +165,12 @@ void FilterSynth::set_shape(float shape) {
     //audio_lock.unlock();
 }
 
+void FilterSynth::set_shape_mod(float shape) {
+    for(auto& filter : filters) {
+        filter.set_shape_mod(shape);
+    }
+}
+
 void FilterSynth::set_attack(float attack) {
     //audio_lock.lock();
     for(auto& filter : filters) {

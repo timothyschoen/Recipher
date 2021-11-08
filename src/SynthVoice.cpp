@@ -52,17 +52,14 @@ void SynthVoice::note_off() {
 }
 
 
+void SynthVoice::set_shape(float new_shape) {
+    shape = new_shape;
+}
 
-void SynthVoice::set_shape(float shape) {
-    shape = std::clamp(shape, 0.0f, 2.99f);
-    
-    int low_shape = shape;
-    int high_shape = low_shape + 1;
-    float distance = shape - low_shape;
-    
-    for(int hr = 0; hr < num_harmonics; hr++) {
-        current_harmonics[hr] = map(distance, shape_harmonics[low_shape][hr], shape_harmonics[high_shape][hr]);
-    }
+
+void SynthVoice::set_shape_mod(float new_shape_mod)
+{
+    shape_mod = new_shape_mod;
 }
 
 void SynthVoice::set_q(float q) {
@@ -98,8 +95,15 @@ void SynthVoice::process(const std::vector<float>& input, std::vector<float>& ou
         
         out_sample += sub;
         
+        float total_shape = std::clamp(shape + shape_mod, 0.0f, 2.9f);
+        int low_shape = total_shape;
+        int high_shape = low_shape + 1;
+        float distance = total_shape - low_shape;
+        
         for(int hr = 0; hr < num_harmonics; hr++) {
-            if(current_harmonics[hr]) {
+            float current_harmonic =  map(distance, shape_harmonics[low_shape][hr], shape_harmonics[high_shape][hr]);
+            
+            if(current_harmonic) {
                 // Apply 2 cascaded filters
                 float filtered = in_sample;
                 
@@ -107,8 +111,7 @@ void SynthVoice::process(const std::vector<float>& input, std::vector<float>& ou
                     filtered = apply_filter(filtered, c, hr);
                 }
                 
-                // Apply clipping distortion
-                out_sample += tanh(filtered * volume * current_harmonics[hr]);
+                out_sample += filtered * volume * current_harmonic;
             }
             
         }

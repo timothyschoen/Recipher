@@ -18,6 +18,8 @@ enum Shape
 using FilterState = std::pair<float, float>;
 
 
+
+
 struct SynthVoice
 {
 
@@ -25,11 +27,14 @@ struct SynthVoice
 
     SynthVoice();
 
+    
+    
     void note_on(int note, float velocity);
     void retrigger(float velocity);
     void note_off();
 
     void set_shape(float shape);
+    void set_shape_mod(float shape);
     void set_q(float q);
     void set_sub(float sub_level);
 
@@ -71,4 +76,7 @@ struct SynthVoice
     float h[num_harmonics];
     float R2;
     float gain;
+    
+    float shape = 0.5f;
+    float shape_mod = 0.5f;
 };

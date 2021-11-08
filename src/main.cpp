@@ -18,11 +18,13 @@ MidiHandler midi;
 daisy::AnalogControl adcAnalog[num_potmeters + 1];
 
 void fake_midi();
-void update_parameters();
+void update_parameters(bool shfit_mode, bool reset = false);
 
 void audio_callback(float** in, float** out, size_t size) {
+    bool shift = adcAnalog[num_potmeters].Process() > 0.3;
     
-    update_parameters();
+    
+    update_parameters(shift);
     
     // Move const input to output for 1 channel
     std::copy(in[1], in[1] + size, out[0]);
@@ -31,12 +33,14 @@ void audio_callback(float** in, float** out, size_t size) {
 
     processor.process(out[0], size);
 
-    
     // Duplicate output
     std::copy(out[0], out[0] + size, out[1]);
 }
 
-
+std::array<float, num_potmeters> page_1 = {0.9, 0.5, 0.6, 0.5, 0.75, 0.6, 0.3, 0.1, 0.2, 0.5, 0.1};
+std::array<float, num_potmeters> page_2 = {0.0, 0.0, 0.1, 0.0, 0.5, 0.02, 0.6, 1.0, 0.0, 0.0};
+std::array<bool, num_potmeters> touched;
+bool last_shift = false;
 
 
 int main() {
@@ -44,6 +48,7 @@ int main() {
     seed.Configure();
     seed.Init();
     
+    std::fill(touched.begin(), touched.end(), true);
     
     float sample_rate = seed.AudioSampleRate();
     
@@ -76,14 +81,16 @@ int main() {
     
     processor.prepare(sample_rate, block_size);
     
-    processor.filter_synth.set_q(20.0f);
-    processor.filter_synth.set_shape(0.0);
+    update_parameters(false, true);
+    update_parameters(true, true);
+    
     
     seed.SetAudioBlockSize(block_size);
     seed.StartAudio(audio_callback);
     
 
-
+    last_shift = adcAnalog[num_potmeters].Process() > 0.3;
+    
 #define FAKE_MIDI 0
 
 #if FAKE_MIDI
@@ -107,8 +114,6 @@ int main() {
                 processor.filter_synth.note_on(m.data[0], m.data[1]);
             }
         }
-        
-        update_parameters();
         
         System::Delay(10);
     }
@@ -207,45 +212,61 @@ void fake_midi() {
     } */
 }
 
+void update_parameters(bool shift, bool reset) {
+    
+    if(shift != last_shift || reset) {
+        std::fill(touched.begin(), touched.end(), false);
+    }
+    
+    last_shift = shift;
 
-void update_parameters() {
-    bool shift = adcAnalog[num_potmeters].Process() > 0.3;
+    auto& page = shift ? page_1 : page_2;
     
-    float volume = adcAnalog[0].Process();
-    float mix = adcAnalog[1].Process(); // mix
-    float delay = adcAnalog[2].Process();
-    float feedback = adcAnalog[3].Process();
+    for(int i = 0; i < num_potmeters; i++) {
+        float value = adcAnalog[i].Process();
+        if(abs(value - page[i]) < 0.05f) {
+            touched[i] = true;
+        }
+        
+        if(touched[i]) {
+            page[i] = value;
+        }
+    }
     
-    float shape = adcAnalog[4].Process();
-    float q = adcAnalog[5].Process();
-    float sub = adcAnalog[6].Process();
-    
-    float a = adcAnalog[7].Process();
-    float d = adcAnalog[8].Process();
-    float s = adcAnalog[9].Process();
-    float r = adcAnalog[10].Process();
-    
-    if(shift) {
-        float lpf_cutoff = delay * 15000.0f;
-        float lpf_q = feedback;
+    if(!shift) {
+        processor.set_volume(page[0]);
+        processor.set_mix(page[1]);
         
         // Set lowpass parameters
-        processor.lpf.set_cutoff(lpf_cutoff);
-        processor.lpf.set_q(lpf_q);
+        processor.lpf.set_q(page[2] + 0.15f);
+        processor.lpf.set_cutoff(page[3] * 15000.0);
+
+        processor.filter_synth.set_shape(page[4] * 3.0f);
+        processor.filter_synth.set_q((page[5] + 0.15f) * 10.0f);
+        processor.filter_synth.set_sub(page[6]);
+        
+        processor.filter_synth.set_attack(std::min(page[7] * 4000.0f, 4000.0f));
+        processor.filter_synth.set_decay(std::min(page[8] * 4000.0f, 4000.0f));
+        processor.filter_synth.set_sustain(std::clamp(page[9], 0.0f, 1.0f));
+        processor.filter_synth.set_release(std::min(page[10] * 4000.0f, 4000.0f));
+        
     }
     else {
+        processor.set_gain(page[1] * 3.0f);
+        
         // Set delay parameters
-        processor.delay_line.set_delay_samples(delay * 10000.0f);
-        processor.delay_line.set_feedback(feedback);
+        processor.delay_line.set_delay_samples(page[2] * 10000.0f);
+        processor.delay_line.set_feedback(page[3]);
+        
+        processor.set_drive(page[4] * 128.0f);
+        
+        processor.set_lfo_shape(page[7] * 3);
+        processor.set_lfo_freq(page[8] * 10.0f);
+        processor.set_lfo_depth(page[9]);
+        processor.set_lfo_dest(page[10] * 2.5);
     }
     
-    processor.set_volume(volume);
-    processor.filter_synth.set_shape(shape * 3.0f);
-    processor.filter_synth.set_q(q * 25.0f);
-    processor.filter_synth.set_sub(sub);
+
     
-    processor.filter_synth.set_attack(std::min(a * 4000.0f, 4000.0f));
-    processor.filter_synth.set_decay(std::min(d * 4000.0f, 4000.0f));
-    processor.filter_synth.set_sustain(std::clamp(s, 0.0f, 1.0f));
-    processor.filter_synth.set_release(std::min(r * 4000.0f, 4000.0f));
+
 }
