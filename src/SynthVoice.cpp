@@ -33,6 +33,7 @@ void SynthVoice::note_on(int note, float velocity) {
     
     envelope.note_on(velocity);
     
+    // Update filters
     for(int i = 0; i < num_harmonics; i++) {
         float frequency = freq * (i + 1.0f);
         if(frequency > 20000) break;
@@ -95,12 +96,14 @@ void SynthVoice::process(const std::vector<float>& input, std::vector<float>& ou
         
         out_sample += sub;
         
+        // Calculate shape position
         float total_shape = std::clamp(shape + shape_mod, 0.0f, 2.9f);
         int low_shape = total_shape;
         int high_shape = low_shape + 1;
         float distance = total_shape - low_shape;
         
         for(int hr = 0; hr < num_harmonics; hr++) {
+            // Calculate volume of current harmonic
             float current_harmonic =  map(distance, shape_harmonics[low_shape][hr], shape_harmonics[high_shape][hr]);
             
             if(current_harmonic) {

@@ -58,13 +58,13 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     addAndMakeVisible(sub_slider);
     
     
-    
+    /*
     sample_speed.setRange(-7.0f, 7.0f);
     sample_speed.setValue(1.0f);
     sample_speed.onValueChange = [this]() {
         audioProcessor.processor.set_sample_speed(sample_speed.getValue());
     };
-    addAndMakeVisible(sample_speed);
+    addAndMakeVisible(sample_speed); */
     
     delay_time.setRange(0, 22050.0f);
     delay_time.setValue(1.0f);

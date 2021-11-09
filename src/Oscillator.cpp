@@ -35,6 +35,7 @@ float Oscillator::tick() {
     phase += frequency / sample_rate;
     if(phase >= 1) phase = phase - 1;
     
+    // Mix between shapes
     int first_shape = shape;
     int second_shape = shape == 3 ? 3 : shape + 1;
     float mix = shape - first_shape;

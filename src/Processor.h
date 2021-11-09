@@ -72,6 +72,7 @@ struct Processor {
             input_buffer[n] = input_buffer[n] + noise_level * (noise_buffer[n] - input_buffer[n]);
         }
         
+        // Modulator functions
         std::function<void(float)> mod_targets[3] = {
             [this](float mod){
                 filter_synth.set_shape_mod(mod * 3.0f);
@@ -82,6 +83,7 @@ struct Processor {
             delay_line.apply_modulation(mod * 5000.0f);
         }};
         
+        // Split modulator between sources when the knob is inbetween positions
         int first_target = lfo_destination;
         int second_target = first_target == 2 ? 0 : lfo_destination + 1;
         float diff = lfo_destination - first_target;
@@ -101,6 +103,7 @@ struct Processor {
         std::copy(input_buffer.begin(), input_buffer.begin() + num_samples, input);
         std::fill(input_buffer.begin(), input_buffer.end(), 0.0f);
 
+        // Apply distortion and compensate volume
         for(int n = 0; n < num_samples; n++) input[n] = (tanh(input[n] * drive) * (1.0f / sqrt(drive))) * volume;
     }
 
@@ -163,5 +166,4 @@ struct Processor {
 private:
 
     std::vector<float> input_buffer, noise_buffer;
-    //float input_buffer[BUFFER_SIZE];
 };

@@ -154,10 +154,10 @@ void Bandpass_hardwareAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
         auto mess = message.getMessage();
         
         if(message.getMessage().isNoteOn()) {
-            processor.note_on(mess.getNoteNumber(), mess.getVelocity(), message.samplePosition);
+            //processor.note_on(mess.getNoteNumber(), mess.getVelocity(), message.samplePosition);
         }
         if(message.getMessage().isNoteOff()) {
-            processor.note_off(mess.getNoteNumber(), message.samplePosition);
+            //processor.note_off(mess.getNoteNumber(), message.samplePosition);
         }
     }
     
