@@ -29,13 +29,29 @@ void SynthVoice::note_on(int note, float velocity) {
     current_note = note;
     float freq = mtof(note);
     
-    sub_osc.set_frequency(freq / 2.0f);
+    sub_osc_1.set_frequency(freq / 2.0f);
+    sub_osc_2.set_frequency(freq / 4.0f);
     
     envelope.note_on(velocity);
     
     // Update filters
     for(int i = 0; i < num_harmonics; i++) {
-        float frequency = freq * (i + 1.0f);
+        float frequency = freq * (i + 1.0f) * stretch;
+        if(frequency > 20000) break;
+        
+        g[i] = std::tan (M_PI * frequency / 44100.0f);
+        h[i] = 1.0f / (1.0f + R2 * g[i] + g[i] * g[i]);
+    }
+}
+
+void SynthVoice::set_stretch(float stretch_amt)
+{
+    float freq = mtof(current_note);
+    stretch = stretch_amt;
+    
+    // Update filters
+    for(int i = 0; i < num_harmonics; i++) {
+        float frequency = freq * (i + 1.0f) * stretch;
         if(frequency > 20000) break;
         
         g[i] = std::tan (M_PI * frequency / 44100.0f);
@@ -92,7 +108,8 @@ void SynthVoice::process(const std::vector<float>& input, std::vector<float>& ou
             continue;
         }
         
-        float sub = sub_osc.tick() * sub_level * volume * 0.1f;
+        float sub = sub_osc_1.tick() * sub_level * volume * 0.1f;
+        sub += sub_osc_2.tick() * std::max(sub_level - 0.5f, 0.0f) * volume * 0.15f;
         
         out_sample += sub;
         

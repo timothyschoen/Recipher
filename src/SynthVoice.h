@@ -37,6 +37,8 @@ struct SynthVoice
     void set_shape_mod(float shape);
     void set_q(float q);
     void set_sub(float sub_level);
+    
+    void set_stretch(float stretch_amt);
 
 
     void process(const std::vector<float>& input, std::vector<float>& output, int start_sample, int num_samples);
@@ -55,7 +57,10 @@ struct SynthVoice
 
     Envelope envelope = Envelope(50.0f, 100.0f, 0.2f, 40.0f, 44100.0f);
 
-    Oscillator sub_osc;
+    Oscillator sub_osc_1;
+    Oscillator sub_osc_2;
+    
+    float stretch = 1.0f;
 
     FilterState svf[cascade][num_harmonics];
 

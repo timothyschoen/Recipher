@@ -126,3 +126,9 @@ void FilterSynth::set_sub(float sub) {
         filter.set_sub(sub);
     }
 }
+
+void FilterSynth::set_stretch(float stretch_amt) {
+    for(auto& filter : filters) {
+        filter.set_stretch(stretch_amt);
+    }
+}

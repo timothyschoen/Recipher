@@ -47,6 +47,8 @@ struct FilterSynth
     void set_shape(float shape);
     void set_shape_mod(float shape);
 
+    void set_stretch(float stretch_amt);
+    
     void set_attack(float attack);
     void set_decay(float decay);
     void set_sustain(float sustain);

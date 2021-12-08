@@ -44,10 +44,13 @@ private:
     Slider shape_slider;
     Slider q_slider;
     
+    TextButton freeze_on;
+    Slider freeze_size;
+    
     Slider lpf_q, lpf_cutoff;
     
     Slider sub_slider;
-    Slider sample_speed;
+    Slider stretch;
     Slider delay_time, delay_fb;
     
     Slider lfo_depth, lfo_rate, lfo_destination;

@@ -16,6 +16,8 @@ bool received_midi = false;
 MidiHandler midi;
 
 daisy::AnalogControl adcAnalog[num_potmeters + 1];
+Led led;
+
 
 void fake_midi();
 void update_parameters(bool shfit_mode, bool reset = false);
@@ -24,6 +26,8 @@ void audio_callback(float** in, float** out, size_t size) {
     bool shift = adcAnalog[num_potmeters].Process() > 0.3;
     
     update_parameters(shift);
+
+    
     
     // Move const input to output for 1 channel
     std::copy(in[1], in[1] + size, out[0]);
@@ -34,6 +38,10 @@ void audio_callback(float** in, float** out, size_t size) {
 
     // Duplicate output
     std::copy(out[0], out[0] + size, out[1]);
+    
+    
+    led.Set((rand() % 100) / 100.0f);
+    led.Update();
 }
 
 // Default parameters for the not-selected page on startup
@@ -51,10 +59,13 @@ int main() {
     std::fill(touched.begin(), touched.end(), true);
     
     float sample_rate = seed.AudioSampleRate();
+    int block_size = 256;
     
     midi.Init(daisy::MidiHandler::INPUT_MODE_UART1, daisy::MidiHandler::OUTPUT_MODE_NONE);
     
-    int block_size = 256;
+    led.Init(daisy::DaisySeed::GetPin (4), false, sample_rate / block_size);
+    
+
    
     // Initialise potmeters
     AdcChannelConfig adcConfig[num_potmeters + 1];
@@ -63,6 +74,8 @@ int main() {
     {
         adcConfig[i].InitSingle (daisy::DaisySeed::GetPin (15 + i));
     }
+    
+    
     
     // Initialise shift knob
     adcConfig[num_potmeters].InitSingle (daisy::DaisySeed::GetPin(28));
@@ -76,6 +89,7 @@ int main() {
     }
     
     adcAnalog[num_potmeters].Init(seed.adc.GetPtr(num_potmeters), sample_rate);
+    
     
 
     //Start reading values

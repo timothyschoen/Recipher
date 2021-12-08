@@ -55,6 +55,8 @@ struct Processor {
         // LFO at control rate...
         float lfo_value = lfo.tick();
         //for(int n = 0; n < num_samples; n++) lfo.tick();
+        
+        
 
         std::copy(input, input + num_samples, input_buffer.begin());
 
@@ -70,6 +72,42 @@ struct Processor {
         for(int n = 0; n < num_samples; n++) {
             input_buffer[n] *= input_gain;
             input_buffer[n] = input_buffer[n] + noise_level * (noise_buffer[n] - input_buffer[n]);
+        }
+        
+        // Input freeze after noise?
+        if(freeze) {
+            for(int n = 0; n < num_samples; n++) {
+                
+                freeze_read++;
+                
+                if(freeze_read >= freeze_write) freeze_read = freeze_write - freeze_size;
+                
+                const auto progress = (float)freeze_read / (freeze_size - 1.0f);
+                float hanning = sqrt(0.5 - 0.5 * cos(2.0 * M_PI * progress));
+                float hanning_inv = sqrt(0.5 - 0.5 * sin(2.0 * M_PI * progress));
+                
+                int overlap_spacing = (freeze_size / 2);
+                int overlap_read = freeze_read + overlap_spacing;
+                if(overlap_read >= freeze_write) freeze_read = (freeze_write - freeze_size) + overlap_spacing;
+                
+                input_buffer[n] = freeze_buffer[freeze_read] * hanning;
+                
+                if(n + overlap_spacing > num_samples) {
+                    overlap_buffer[(n + overlap_spacing) - num_samples] = freeze_buffer[freeze_read] * hanning;
+                }
+                else {
+                    input_buffer[n] += overlap_buffer[n];
+                    input_buffer[n + overlap_spacing] = freeze_buffer[overlap_read] * hanning_inv;
+                }
+            }
+        }
+        else {
+            for(int n = 0; n < num_samples; n++) {
+                freeze_buffer[freeze_write] = input_buffer[n];
+                freeze_write++;
+                if(freeze_write >= freeze_buffer.size()) freeze_write = 0;
+                freeze_read = freeze_write - freeze_size;
+            }
         }
         
         // Modulator functions
@@ -98,7 +136,7 @@ struct Processor {
 
         lpf.process(input_buffer, input_buffer);
 
-        delay_line.process(input_buffer, input_buffer);
+        //delay_line.process(input_buffer, input_buffer);
         
         std::copy(input_buffer.begin(), input_buffer.begin() + num_samples, input);
         std::fill(input_buffer.begin(), input_buffer.end(), 0.0f);
@@ -162,6 +200,15 @@ struct Processor {
     float noise_level = 0.2;
     float drive = 1.0f;
     float input_gain = 1.0f;
+    
+    
+    std::vector<float> freeze_buffer = std::vector<float>(22050, 0.0f);
+    std::vector<float> overlap_buffer = std::vector<float>(2048, 0.0f);
+    int freeze_write = 0;
+    int freeze_read = 0;
+
+    bool freeze = false;
+    int freeze_size = 1024;
 
 private:
 
