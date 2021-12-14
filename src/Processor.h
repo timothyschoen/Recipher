@@ -92,7 +92,7 @@ struct Processor {
                 
                 input_buffer[n] = freeze_buffer[freeze_read] * hanning;
                 
-                if(n + overlap_spacing > num_samples) {
+                if(n + overlap_spacing >= num_samples) {
                     overlap_buffer[(n + overlap_spacing) - num_samples] = freeze_buffer[freeze_read] * hanning;
                 }
                 else {

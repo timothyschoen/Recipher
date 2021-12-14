@@ -64,8 +64,6 @@ int main() {
     midi.Init(daisy::MidiHandler::INPUT_MODE_UART1, daisy::MidiHandler::OUTPUT_MODE_NONE);
     
     led.Init(daisy::DaisySeed::GetPin (4), false, sample_rate / block_size);
-    
-
    
     // Initialise potmeters
     AdcChannelConfig adcConfig[num_potmeters + 1];
@@ -183,6 +181,8 @@ void update_parameters(bool shift, bool reset) {
         processor.delay_line.set_feedback(page[3]);
         
         processor.set_drive(page[4] * 128.0f);
+        
+        processor.filter_synth.set_stretch(page[5] * 4.0f);
         
         processor.set_lfo_shape(page[7] * 3);
         processor.set_lfo_freq(page[8] * 10.0f);

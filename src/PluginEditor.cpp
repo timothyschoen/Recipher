@@ -19,6 +19,10 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     
     p.keystate.addListener(this);
     
+    
+    
+    
+    attachments.add(new SliderParameterAttachment(*p.params["Shape"], shape_slider));
     shape_slider.setRange(0, 3);
     shape_slider.setValue(2.0f);
     shape_slider.onValueChange = [this]() {
@@ -26,6 +30,7 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     };
     addAndMakeVisible(shape_slider);
     
+    attachments.add(new SliderParameterAttachment(*p.params["Q"], q_slider));
     q_slider.setRange(0, 60);
     q_slider.setValue(2.0f);
     q_slider.onValueChange = [this]() {
@@ -34,6 +39,7 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     addAndMakeVisible(q_slider);
     
     
+    attachments.add(new SliderParameterAttachment(*p.params["LPFQ"], lpf_q));
     lpf_q.setRange(0, 3);
     lpf_q.setValue(1.0f);
     lpf_q.onValueChange = [this]() {
@@ -41,7 +47,8 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     };
     addAndMakeVisible(lpf_q);
     
-    lpf_cutoff.setRange(0, 20000.0f);
+    attachments.add(new SliderParameterAttachment(*p.params["Cutoff"], lpf_cutoff));
+    lpf_cutoff.setRange(0, 19000.0f);
     lpf_cutoff.setValue(5000.0f);
     lpf_cutoff.setSkewFactor(0.5);
     lpf_cutoff.onValueChange = [this]() {
@@ -49,7 +56,7 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     };
     addAndMakeVisible(lpf_cutoff);
     
-    
+    attachments.add(new SliderParameterAttachment(*p.params["Sub"], sub_slider));
     sub_slider.setRange(0, 1.0f);
     sub_slider.setValue(1.0f);
     sub_slider.onValueChange = [this]() {
@@ -58,7 +65,7 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     addAndMakeVisible(sub_slider);
     
     
-    
+    attachments.add(new SliderParameterAttachment(*p.params["Stretch"], stretch));
     stretch.setRange(0.2f, 4.0f);
     stretch.setValue(1.0f);
     stretch.onValueChange = [this]() {
@@ -66,14 +73,16 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     };
     addAndMakeVisible(stretch);
     
-    
+    attachments.add(new SliderParameterAttachment(*p.params["Freeze"], freeze_size));
     freeze_size.setRange(128, 1024);
     freeze_size.setValue(512);
     freeze_size.onValueChange = [this]() {
-        audioProcessor.processor.freeze_read = stretch.getValue();
+        //audioProcessor.processor.freeze_size = stretch.getValue();
     };
     addAndMakeVisible(freeze_size);
     
+    
+    attachments.add(new SliderParameterAttachment(*p.params["Time"], delay_time));
     delay_time.setRange(0, 22050.0f);
     delay_time.setValue(1.0f);
     delay_time.onValueChange = [this]() {
@@ -81,6 +90,7 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     };
     addAndMakeVisible(delay_time);
     
+    attachments.add(new SliderParameterAttachment(*p.params["FB"], delay_fb));
     delay_fb.setRange(0.0f, 0.98f);
     delay_fb.setValue(0.3f);
     delay_fb.onValueChange = [this]() {
@@ -88,6 +98,7 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     };
     addAndMakeVisible(delay_fb);
     
+    attachments.add(new SliderParameterAttachment(*p.params["LFODepth"], lfo_depth));
     lfo_depth.setRange(0, 1.0f);
     lfo_depth.setValue(1.0f);
     lfo_depth.onValueChange = [this]() {
@@ -96,6 +107,7 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     addAndMakeVisible(lfo_depth);
     
     
+    attachments.add(new SliderParameterAttachment(*p.params["LFORate"], lfo_rate));
     lfo_rate.setRange(0, 16.0f);
     lfo_rate.setValue(1.0f);
     lfo_rate.onValueChange = [this]() {
@@ -103,7 +115,7 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     };
     addAndMakeVisible(lfo_rate);
     
-    
+    attachments.add(new SliderParameterAttachment(*p.params["LFODest"], lfo_destination));
     lfo_destination.setRange(0, 3.0f, 1);
     lfo_destination.setValue(1.0f);
     lfo_destination.onValueChange = [this]() {
@@ -112,29 +124,43 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     addAndMakeVisible(lfo_destination);
     
     
+    attachments.add(new SliderParameterAttachment(*p.params["A"], adsr_sliders[0]));
     adsr_sliders[0].setRange(0., 3000, 1);
     adsr_sliders[0].setValue(50);
     adsr_sliders[0].onValueChange = [this]() {
         audioProcessor.processor.filter_synth.set_attack(adsr_sliders[0].getValue());
     };
     
+    attachments.add(new SliderParameterAttachment(*p.params["D"], adsr_sliders[1]));
     adsr_sliders[1].setRange(0., 3000, 1);
     adsr_sliders[1].setValue(1000);
     adsr_sliders[1].onValueChange = [this]() {
         audioProcessor.processor.filter_synth.set_decay(adsr_sliders[1].getValue());
     };
     
+    attachments.add(new SliderParameterAttachment(*p.params["S"], adsr_sliders[2]));
     adsr_sliders[2].setRange(0., 1.0, 0.1);
     adsr_sliders[2].setValue(0.2);
     adsr_sliders[2].onValueChange = [this]() {
         audioProcessor.processor.filter_synth.set_sustain(adsr_sliders[2].getValue());
     };
     
+    attachments.add(new SliderParameterAttachment(*p.params["R"], adsr_sliders[3]));
     adsr_sliders[3].setRange(0., 4000, 0.1);
     adsr_sliders[3].setValue(1000);
     adsr_sliders[3].onValueChange = [this]() {
         audioProcessor.processor.filter_synth.set_release(adsr_sliders[3].getValue());
     };
+    
+    
+    attachments.add(new SliderParameterAttachment(*p.params["NoiseMix"], noise_mix));
+    noise_mix.setRange(0., 1.0, 0.1);
+    noise_mix.setValue(1000);
+    noise_mix.onValueChange = [this]() {
+        audioProcessor.processor.set_mix(noise_mix.getValue());
+    };
+    addAndMakeVisible(noise_mix);
+    
     
     
     for(auto& slider : adsr_sliders) addAndMakeVisible(slider);
@@ -143,28 +169,24 @@ Bandpass_hardwareAudioProcessorEditor::Bandpass_hardwareAudioProcessorEditor (Ba
     freeze_on.onClick = [this](){
         audioProcessor.processor.freeze = freeze_on.getToggleState();
     };
-    
-    lfo_destination.setValue(1.0f);
-    lfo_destination.onValueChange = [this]() {
-        audioProcessor.processor.lfo_destination = lfo_destination.getValue();
-    };
-    addAndMakeVisible(lfo_destination);
-    
+    freeze_on.setColour(TextButton::buttonOnColourId, findColour(Slider::thumbColourId));
+    addAndMakeVisible(freeze_on);
     
     addAndMakeVisible(keyboard_component);
     
-    
+    for(auto& attachment : attachments) attachment->sendInitialUpdate();
 }
 
 Bandpass_hardwareAudioProcessorEditor::~Bandpass_hardwareAudioProcessorEditor()
 {
+    audioProcessor.keystate.removeListener(this);
 }
 
 //==============================================================================
 void Bandpass_hardwareAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (Colour(70, 70, 70));
     
     g.setColour(Colours::white);
     
@@ -188,19 +210,18 @@ void Bandpass_hardwareAudioProcessorEditor::paint (juce::Graphics& g)
     g.drawFittedText ("LFO DEPTH", 920, 2*30, 80, 30, Justification::left, 1);
     g.drawFittedText ("LFO DEST.", 920, 3*30, 80, 30, Justification::left, 1);
     
-    g.drawFittedText ("FREEZE SIZE", 920, 4*30, 80, 30, Justification::left, 1);
-    g.drawFittedText ("FREEZE ON/OFF", 920, 4*30, 80, 30, Justification::left, 1);
+    g.drawFittedText ("NOISE MIX", 920, 4*30, 80, 30, Justification::left, 1);
+    
+    g.drawFittedText ("FREEZE SIZE", 920, 5*30, 80, 30, Justification::left, 1);
+    g.drawFittedText ("FREEZE ON/OFF", 920, 6*30, 80, 30, Justification::left, 1);
+    
+
 }
 
 void Bandpass_hardwareAudioProcessorEditor::resized()
 {
     
     keyboard_component.setBounds (5, getHeight()-100, getWidth()-10, 100);
-    
-    toggle_buttons[0].setBounds (20, 1*30, 61, 20);
-    toggle_buttons[1].setBounds (80, 1*30, 61, 20);
-    toggle_buttons[2].setBounds (140, 1*30, 61, 20);
-    toggle_buttons[3].setBounds (200, 1*30, 61, 20);
     
     shape_slider.setBounds(20, 1*30, 250, 30);
     q_slider.setBounds (20, 2*30, 250, 30);
@@ -222,7 +243,9 @@ void Bandpass_hardwareAudioProcessorEditor::resized()
     lfo_depth.setBounds (660, 2*30, 250, 30);
     lfo_destination.setBounds (660, 3*30, 250, 30);
     
-    freeze_size.setBounds (660, 4*30, 250, 30);
-    freeze_on.setBounds (680, 5*30, 30, 30);
+    noise_mix.setBounds(660, 4*30, 250, 30);
+    
+    freeze_size.setBounds (660, 5*30, 250, 30);
+    freeze_on.setBounds (880, 6*30, 30, 30);
     
 }

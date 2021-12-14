@@ -46,11 +46,8 @@ struct SynthVoice
     float apply_filter(float input, int c, int hr);
 
     void clear_filters();
-
-    std::vector<float> current_harmonics;
-
+    
     float sub_level = 0.0f;
-
 
     static constexpr int num_harmonics = 5;
     static constexpr int cascade = 2;

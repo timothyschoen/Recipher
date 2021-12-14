@@ -58,6 +58,8 @@ public:
 
     Processor processor;
     
+    std::map<String, RangedAudioParameter*> params;
+    
     MidiKeyboardState keystate;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Bandpass_hardwareAudioProcessor)

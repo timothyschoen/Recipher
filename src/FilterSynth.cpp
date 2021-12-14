@@ -54,7 +54,10 @@ void FilterSynth::note_on(int midi_note, int velocity) {
     
     // Final way out: use the oldest note
     filters[active_voices[0]].note_on(midi_note, velocity);
-    std::rotate(active_voices.begin(), active_voices.begin() + 1, active_voices.end()); // inefficient...
+    
+    if(active_voices.size() >= 2) {
+        std::rotate(active_voices.begin(), active_voices.begin() + 1, active_voices.end()); // inefficient...
+    }
     return;
 }
 

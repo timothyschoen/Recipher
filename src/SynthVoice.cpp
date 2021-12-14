@@ -3,7 +3,6 @@
 
 SynthVoice::SynthVoice() {
     shape_harmonics.resize((int)Shape::NumShapes, std::vector<float>(num_harmonics, 0.0f));
-    current_harmonics.resize(num_harmonics);
     
     // Initialise harmonics for each shape
     for(int i = 0; i < num_harmonics; i++) {
@@ -36,7 +35,9 @@ void SynthVoice::note_on(int note, float velocity) {
     
     // Update filters
     for(int i = 0; i < num_harmonics; i++) {
-        float frequency = freq * (i + 1.0f) * stretch;
+        float frequency = freq * ((i * stretch) + 1.0f);
+        
+        
         if(frequency > 20000) break;
         
         g[i] = std::tan (M_PI * frequency / 44100.0f);
@@ -51,7 +52,7 @@ void SynthVoice::set_stretch(float stretch_amt)
     
     // Update filters
     for(int i = 0; i < num_harmonics; i++) {
-        float frequency = freq * (i + 1.0f) * stretch;
+        float frequency = freq * ((i * stretch) + 1.0f) + (stretch * 100.0f);
         if(frequency > 20000) break;
         
         g[i] = std::tan (M_PI * frequency / 44100.0f);

@@ -38,7 +38,6 @@ private:
     Bandpass_hardwareAudioProcessor& audioProcessor;
     
     MidiKeyboardComponent keyboard_component;
-    TextButton toggle_buttons[4];
     Slider adsr_sliders[4];
     
     Slider shape_slider;
@@ -54,6 +53,10 @@ private:
     Slider delay_time, delay_fb;
     
     Slider lfo_depth, lfo_rate, lfo_destination;
+    
+    Slider noise_mix;
+    
+    OwnedArray<SliderParameterAttachment> attachments;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Bandpass_hardwareAudioProcessorEditor)
 };
