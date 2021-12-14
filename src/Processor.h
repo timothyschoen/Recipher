@@ -136,7 +136,7 @@ struct Processor {
 
         lpf.process(input_buffer, input_buffer);
 
-        //delay_line.process(input_buffer, input_buffer);
+        delay_line.process(input_buffer, input_buffer);
         
         std::copy(input_buffer.begin(), input_buffer.begin() + num_samples, input);
         std::fill(input_buffer.begin(), input_buffer.end(), 0.0f);

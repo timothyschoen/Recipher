@@ -10,7 +10,7 @@ class Envelope {
 
   int state = 0;
   bool playing = false;
-  float target[3] = {1, 0.3, 0};
+  float target[4] = {1, 0.3, 0};
   float increments[3] = {0.01, -0.2, -0.01};
   bool released;
   bool releasing;

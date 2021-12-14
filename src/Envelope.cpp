@@ -37,7 +37,7 @@ float Envelope::tick() {
         level += increments[state];
     }
     // If we have arrived at our attack or release target, move to the next phase
-    if((level >= target[state] && state == 0) || (level <= target[state] && state == 2)) {
+    if((state == 0 && level >= target[state]) || (state == 2 && level <= target[state])) {
         state++;
     }
     // If we reach our sustain phase, stop moving and hold until note-off
