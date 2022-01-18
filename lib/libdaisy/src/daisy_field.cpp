@@ -89,7 +89,7 @@ void DaisyField::Init(bool boost)
     for(size_t i = 0; i < SW_LAST; i++)
     {
         dsy_gpio_pin p = seed.GetPin(sw_pin[i]);
-        sw[i].Init(p, AudioCallbackRate());
+        sw[i].Init(p);
     }
 
     // ADCs
@@ -125,10 +125,14 @@ void DaisyField::Init(bool boost)
     keyboard_sr_.Init(keyboard_cfg);
 
     // OLED
-    dsy_gpio_pin oled_pins[OledDisplay::NUM_PINS];
-    oled_pins[OledDisplay::DATA_COMMAND] = seed.GetPin(PIN_OLED_CMD);
-    oled_pins[OledDisplay::RESET]        = {DSY_GPIOX, 0}; // Not a real pin...
-    display.Init(oled_pins);
+    OledDisplay<SSD130x4WireSpi128x64Driver>::Config display_config;
+
+    display_config.driver_config.transport_config.pin_config.dc
+        = seed.GetPin(PIN_OLED_CMD);
+    display_config.driver_config.transport_config.pin_config.reset
+        = {DSY_GPIOX, 0}; // Not a real pin...
+
+    display.Init(display_config);
 
     // LEDs
     // 2x PCA9685 addresses 0x00, and 0x02
@@ -147,6 +151,9 @@ void DaisyField::Init(bool boost)
     gate_out.pin  = seed.GetPin(PIN_GATE_OUT);
     dsy_gpio_init(&gate_out);
 
+    //midi
+    MidiUartHandler::Config midi_config;
+    midi.Init(midi_config);
 
     DacHandle::Config cfg;
     cfg.bitdepth   = DacHandle::BitDepth::BITS_12;
@@ -186,9 +193,23 @@ void DaisyField::ChangeAudioCallback(AudioHandle::AudioCallback cb)
     seed.ChangeAudioCallback(cb);
 }
 
+void DaisyField::SetHidUpdateRates()
+{
+    //set the hids to the new update rate
+    for(size_t i = 0; i < KNOB_LAST; i++)
+    {
+        knob[i].SetSampleRate(AudioCallbackRate());
+    }
+    for(size_t i = 0; i < CV_LAST; i++)
+    {
+        cv[i].SetSampleRate(AudioCallbackRate());
+    }
+}
+
 void DaisyField::SetAudioSampleRate(SaiHandle::Config::SampleRate samplerate)
 {
     seed.SetAudioSampleRate(samplerate);
+    SetHidUpdateRates();
 }
 
 float DaisyField::AudioSampleRate()
@@ -199,6 +220,7 @@ float DaisyField::AudioSampleRate()
 void DaisyField::SetAudioBlockSize(size_t size)
 {
     seed.SetAudioBlockSize(size);
+    SetHidUpdateRates();
 }
 
 size_t DaisyField::AudioBlockSize()
@@ -354,9 +376,9 @@ void DaisyField::VegasMode()
         led_driver.SetLed(led_grp_b[idx], 1.0f - key_bright);
         led_driver.SetLed(led_grp_c[idx], key_bright);
         // OLED moves a bar across the screen
-        uint32_t bar_x = (now >> 4) % SSD1309_WIDTH;
+        uint32_t bar_x = (now >> 4) % display.Width();
         display.Fill(false);
-        for(size_t i = 0; i < SSD1309_HEIGHT; i++)
+        for(size_t i = 0; i < display.Height(); i++)
         {
             display.DrawPixel(bar_x, i, true);
         }

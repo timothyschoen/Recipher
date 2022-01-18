@@ -40,10 +40,6 @@ void DaisyPatch::Init(bool boost)
     InitDisplay();
     InitMidi();
     InitControls();
-    // Reset AK4556
-    dsy_gpio_write(&ak4556_reset_pin_, 0);
-    DelayMs(10);
-    dsy_gpio_write(&ak4556_reset_pin_, 1);
     // Set Screen update vars
     screen_update_period_ = 17; // roughly 60Hz
     screen_update_last_   = seed.system.GetNow();
@@ -52,6 +48,14 @@ void DaisyPatch::Init(bool boost)
 void DaisyPatch::DelayMs(size_t del)
 {
     seed.DelayMs(del);
+}
+
+void DaisyPatch::SetHidUpdateRates()
+{
+    for(size_t i = 0; i < CTRL_LAST; i++)
+    {
+        controls[i].SetSampleRate(AudioCallbackRate());
+    }
 }
 
 void DaisyPatch::StartAudio(AudioHandle::AudioCallback cb)
@@ -72,6 +76,7 @@ void DaisyPatch::StopAudio()
 void DaisyPatch::SetAudioSampleRate(SaiHandle::Config::SampleRate samplerate)
 {
     seed.SetAudioSampleRate(samplerate);
+    SetHidUpdateRates();
 }
 
 float DaisyPatch::AudioSampleRate()
@@ -82,6 +87,7 @@ float DaisyPatch::AudioSampleRate()
 void DaisyPatch::SetAudioBlockSize(size_t size)
 {
     seed.SetAudioBlockSize(size);
+    SetHidUpdateRates();
 }
 
 size_t DaisyPatch::AudioBlockSize()
@@ -144,9 +150,9 @@ void DaisyPatch::DisplayControls(bool invert)
             float  v;
             size_t dest;
             curx = (barspacing * i + 1) + (barwidth * i);
-            cury = SSD1309_HEIGHT;
+            cury = display.Height();
             v    = GetKnobValue(static_cast<DaisyPatch::Ctrl>(i));
-            dest = (v * SSD1309_HEIGHT);
+            dest = (v * display.Height());
             for(size_t j = dest; j > 0; j--)
             {
                 for(size_t k = 0; k < barwidth; k++)
@@ -166,18 +172,28 @@ void DaisyPatch::InitAudio()
     // Handle Seed Audio as-is and then
     SaiHandle::Config sai_config[2];
     // Internal Codec
+    if(seed.CheckBoardVersion() == DaisySeed::BoardVersion::DAISY_SEED_1_1)
+    {
+        sai_config[0].pin_config.sa = {DSY_GPIOE, 6};
+        sai_config[0].pin_config.sb = {DSY_GPIOE, 3};
+        sai_config[0].a_dir         = SaiHandle::Config::Direction::RECEIVE;
+        sai_config[0].b_dir         = SaiHandle::Config::Direction::TRANSMIT;
+    }
+    else
+    {
+        sai_config[0].pin_config.sa = {DSY_GPIOE, 6};
+        sai_config[0].pin_config.sb = {DSY_GPIOE, 3};
+        sai_config[0].a_dir         = SaiHandle::Config::Direction::TRANSMIT;
+        sai_config[0].b_dir         = SaiHandle::Config::Direction::RECEIVE;
+    }
     sai_config[0].periph          = SaiHandle::Config::Peripheral::SAI_1;
     sai_config[0].sr              = SaiHandle::Config::SampleRate::SAI_48KHZ;
     sai_config[0].bit_depth       = SaiHandle::Config::BitDepth::SAI_24BIT;
     sai_config[0].a_sync          = SaiHandle::Config::Sync::MASTER;
     sai_config[0].b_sync          = SaiHandle::Config::Sync::SLAVE;
-    sai_config[0].a_dir           = SaiHandle::Config::Direction::TRANSMIT;
-    sai_config[0].b_dir           = SaiHandle::Config::Direction::RECEIVE;
     sai_config[0].pin_config.fs   = {DSY_GPIOE, 4};
     sai_config[0].pin_config.mclk = {DSY_GPIOE, 2};
     sai_config[0].pin_config.sck  = {DSY_GPIOE, 5};
-    sai_config[0].pin_config.sa   = {DSY_GPIOE, 6};
-    sai_config[0].pin_config.sb   = {DSY_GPIOE, 3};
 
     // External Codec
     sai_config[1].periph          = SaiHandle::Config::Peripheral::SAI_2;
@@ -199,8 +215,7 @@ void DaisyPatch::InitAudio()
 
     // Reset Pin for AK4556
     // Built-in AK4556 was reset during Seed Init
-    dsy_gpio_pin codec_reset_pin = seed.GetPin(29);
-    //codec_ak4556_init(codec_reset_pin);
+    dsy_gpio_pin codec_reset_pin = seed.GetPin(PIN_AK4556_RESET);
     Ak4556::Init(codec_reset_pin);
 
     // Reinit Audio for _both_ codecs...
@@ -233,16 +248,20 @@ void DaisyPatch::InitControls()
 
 void DaisyPatch::InitDisplay()
 {
-    dsy_gpio_pin pincfg[OledDisplay::NUM_PINS];
-    pincfg[OledDisplay::DATA_COMMAND] = seed.GetPin(PIN_OLED_DC);
-    pincfg[OledDisplay::RESET]        = seed.GetPin(PIN_OLED_RESET);
-    display.Init(pincfg);
+    OledDisplay<SSD130x4WireSpi128x64Driver>::Config display_config;
+
+    display_config.driver_config.transport_config.pin_config.dc
+        = seed.GetPin(PIN_OLED_DC);
+    display_config.driver_config.transport_config.pin_config.reset
+        = seed.GetPin(PIN_OLED_RESET);
+
+    display.Init(display_config);
 }
 
 void DaisyPatch::InitMidi()
 {
-    midi.Init(MidiHandler::MidiInputMode::INPUT_MODE_UART1,
-              MidiHandler::MidiOutputMode::OUTPUT_MODE_UART1);
+    MidiUartHandler::Config midi_config;
+    midi.Init(midi_config);
 }
 
 void DaisyPatch::InitCvOutputs()
@@ -263,8 +282,7 @@ void DaisyPatch::InitEncoder()
 {
     encoder.Init(seed.GetPin(PIN_ENC_A),
                  seed.GetPin(PIN_ENC_B),
-                 seed.GetPin(PIN_ENC_CLICK),
-                 AudioCallbackRate());
+                 seed.GetPin(PIN_ENC_CLICK));
 }
 
 void DaisyPatch::InitGates()

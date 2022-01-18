@@ -6,7 +6,7 @@ CPP_STANDARD = --std=gnu++17
 OPT ?= -O2
 
 # Sources
-CPP_SOURCES = src/main.cpp src/FilterSynth.cpp src/SynthVoice.cpp src/Envelope.cpp src/Oscillator.cpp
+CPP_SOURCES = src/main.cpp
 
 # Library Locations
 LIBDAISY_DIR ?= lib/libdaisy

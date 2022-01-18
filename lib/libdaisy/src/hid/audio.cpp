@@ -32,6 +32,7 @@ class AudioHandle::Impl
     AudioHandle::Result Init(const AudioHandle::Config config, SaiHandle sai);
     AudioHandle::Result
                         Init(const AudioHandle::Config config, SaiHandle sai1, SaiHandle sai2);
+    AudioHandle::Result DeInit();
     AudioHandle::Result Start(AudioHandle::AudioCallback callback);
     AudioHandle::Result Start(AudioHandle::InterleavingAudioCallback callback);
     AudioHandle::Result Stop();
@@ -51,10 +52,10 @@ class AudioHandle::Impl
 
     AudioHandle::Result SetBlockSize(size_t size)
     {
-        config_.blocksize
-            = size <= kAudioMaxBufferSize ? size : kAudioMaxBufferSize;
-        return size <= kAudioMaxBufferSize ? AudioHandle::Result::OK
-                                           : AudioHandle::Result::ERR;
+        size_t maxSize    = kAudioMaxBufferSize / 4;
+        config_.blocksize = size <= maxSize ? size : maxSize;
+        return size <= maxSize ? AudioHandle::Result::OK
+                               : AudioHandle::Result::ERR;
     }
 
     float GetSampleRate() { return sai1_.GetSampleRate(); }
@@ -126,6 +127,26 @@ AudioHandle::Result AudioHandle::Impl::Init(const AudioHandle::Config config,
     buff_rx_[1] = dsy_audio_rx_buffer[1];
     buff_tx_[1] = dsy_audio_tx_buffer[1];
     // How do we want to handle the rx/tx buffs for the second peripheral of audio..?
+    return Result::OK;
+}
+
+AudioHandle::Result AudioHandle::Impl::DeInit()
+{
+    Stop();
+    if(sai1_.IsInitialized())
+    {
+        if(sai1_.DeInit() != SaiHandle::Result::OK)
+        {
+            return Result::ERR;
+        }
+    }
+    if(sai2_.IsInitialized())
+    {
+        if(sai2_.DeInit() != SaiHandle::Result::OK)
+        {
+            return Result::ERR;
+        }
+    }
     return Result::OK;
 }
 
@@ -387,7 +408,7 @@ void AudioHandle::Impl::InternalCallback(int32_t* in, int32_t* out, size_t size)
                 break;
             default: break;
         }
-        cb((float**)fin, (float**)fout, size / 2);
+        cb(fin, fout, size / 2);
         // Reinterleave and scale
         switch(bd)
         {
@@ -461,6 +482,11 @@ AudioHandle::Init(const Config& config, SaiHandle sai1, SaiHandle sai2)
     // Figure out proper pattern for singleton behavior here.
     pimpl_ = &audio_handle;
     return pimpl_->Init(config, sai1, sai2);
+}
+
+AudioHandle::Result AudioHandle::DeInit()
+{
+    return pimpl_->DeInit();
 }
 
 const AudioHandle::Config& AudioHandle::GetConfig() const

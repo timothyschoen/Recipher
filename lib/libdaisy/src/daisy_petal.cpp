@@ -96,6 +96,20 @@ void DaisyPetal::DelayMs(size_t del)
     seed.DelayMs(del);
 }
 
+void DaisyPetal::SetHidUpdateRates()
+{
+    for(size_t i = 0; i < KNOB_LAST; i++)
+    {
+        knob[i].SetSampleRate(AudioCallbackRate());
+    }
+    for(size_t i = 0; i < FOOTSWITCH_LED_LAST; i++)
+    {
+        footswitch_led[i].SetSampleRate(AudioCallbackRate());
+    }
+    expression.SetSampleRate(AudioCallbackRate());
+}
+
+
 void DaisyPetal::StartAudio(AudioHandle::InterleavingAudioCallback cb)
 {
     seed.StartAudio(cb);
@@ -124,6 +138,7 @@ void DaisyPetal::StopAudio()
 void DaisyPetal::SetAudioBlockSize(size_t size)
 {
     seed.SetAudioBlockSize(size);
+    SetHidUpdateRates();
 }
 
 size_t DaisyPetal::AudioBlockSize()
@@ -134,6 +149,7 @@ size_t DaisyPetal::AudioBlockSize()
 void DaisyPetal::SetAudioSampleRate(SaiHandle::Config::SampleRate samplerate)
 {
     seed.SetAudioSampleRate(samplerate);
+    SetHidUpdateRates();
 }
 
 float DaisyPetal::AudioSampleRate()
@@ -272,7 +288,7 @@ void DaisyPetal::InitSwitches()
 
     for(size_t i = 0; i < SW_LAST; i++)
     {
-        switches[i].Init(seed.GetPin(pin_numbers[i]), AudioCallbackRate());
+        switches[i].Init(seed.GetPin(pin_numbers[i]));
     }
 }
 
@@ -282,7 +298,7 @@ void DaisyPetal::InitEncoder()
     a     = seed.GetPin(ENC_A_PIN);
     b     = seed.GetPin(ENC_B_PIN);
     click = seed.GetPin(ENC_CLICK_PIN);
-    encoder.Init(a, b, click, AudioCallbackRate());
+    encoder.Init(a, b, click);
 }
 
 void DaisyPetal::InitLeds()

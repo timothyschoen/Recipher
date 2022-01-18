@@ -159,7 +159,8 @@ build/src/per/uart.o: src/per/uart.cpp \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/hash_bytes.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/nested_exception.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/uniform_int_dist.h \
- /Applications/ARM/arm-none-eabi/include/c++/10.3.1/limits
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/limits \
+ src/util/hal_map.h
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
 src/sys/stm32h7xx_hal_conf.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h:
@@ -323,3 +324,4 @@ src/util/ringbuffer.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/nested_exception.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/uniform_int_dist.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/limits:
+src/util/hal_map.h:

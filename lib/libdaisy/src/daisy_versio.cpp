@@ -54,7 +54,7 @@ void DaisyVersio::Init(bool boost)
                          PIN_ADC_CV6};
 
     // gate in and momentary switch
-    tap.Init(seed.GetPin(PIN_SW), blockrate_);
+    tap.Init(seed.GetPin(PIN_SW));
     dsy_gpio_pin gate_gpio = seed.GetPin(PIN_TRIG_IN);
     gate.Init(&gate_gpio);
 
@@ -88,6 +88,15 @@ void DaisyVersio::Init(bool boost)
     }
 }
 
+void DaisyVersio::SetHidUpdateRates()
+{
+    for(size_t i = 0; i < KNOB_LAST; i++)
+    {
+        knobs[i].SetSampleRate(AudioCallbackRate());
+    }
+}
+
+
 void DaisyVersio::StartAudio(AudioHandle::InterleavingAudioCallback cb)
 {
     seed.StartAudio(cb);
@@ -116,6 +125,7 @@ void DaisyVersio::StopAudio()
 void DaisyVersio::SetAudioBlockSize(size_t size)
 {
     seed.SetAudioBlockSize(size);
+    SetHidUpdateRates();
 }
 
 size_t DaisyVersio::AudioBlockSize()
@@ -126,6 +136,7 @@ size_t DaisyVersio::AudioBlockSize()
 void DaisyVersio::SetAudioSampleRate(SaiHandle::Config::SampleRate samplerate)
 {
     seed.SetAudioSampleRate(samplerate);
+    SetHidUpdateRates();
 }
 
 float DaisyVersio::AudioSampleRate()

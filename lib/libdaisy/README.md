@@ -9,10 +9,13 @@
 <br>
 <!--CI Badges-->
 <p align="center">
-    <a href="https://github.com/electro-smith/libDaisy/actions?query=workflow%3ABuild">
+    <a href="https://github.com/electro-smith/libDaisy/actions/workflows/build.yml">
       <img src="https://github.com/electro-smith/libDaisy/workflows/Build/badge.svg">
     </a>
-    <a href="https://github.com/electro-smith/libDaisy/actions?query=workflow%3AStyle">
+    <a href="https://github.com/electro-smith/libDaisy/actions/workflows/unit_tests.yaml">
+      <img src="https://github.com/electro-smith/libDaisy/workflows/Unit%20Tests/badge.svg">
+    </a>
+    <a href="https://github.com/electro-smith/libDaisy/actions/workflows/style.yml">
       <img src="https://github.com/electro-smith/libDaisy/workflows/Style/badge.svg">
     </a>
     <a href="https://electro-smith.github.io/libDaisy/index.html">
@@ -87,6 +90,7 @@ Prefixes and their meanings:
 - **per** - Peripheral level, internal to MCU (i2c, spi, etc.)
 - **dev** - External device support (external flash chips, DACs, codecs, etc.)
 - **hid** - User level interface elements (encoders, switches, audio, etc.)
+- **ui** - User interface building blocks like menu systems, event queues, etc.
 - **util** - library level elements used within the library (not included via daisy.h)
 - **daisy** - core API files (specific boards and platforms have extended user APIs that configure libDaisy more below).
 
@@ -95,6 +99,8 @@ Also included is a core/ folder containing:
 - a generic Makefile that can be included in a project Makefile to simplify getting started
 - a linker script for defining the sections of memory used by the firmware
 - core files for starting the hardware (system_stm32h7xx.c, startup_stm32h750xx.s, etc.)
+
+Unit Tests can be found in the test/ folder. [Here's a tutorial on how to develop unit tested code for libDaisy](doc/Unit-Testing.md).
 
 ### daisy.h
 

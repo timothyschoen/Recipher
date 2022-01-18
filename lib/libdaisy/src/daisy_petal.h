@@ -78,12 +78,12 @@ class DaisyPetal
 
 
     /** Starts the callback
-    \cb Interleaved callback function
+    \param cb Interleaved callback function
     */
     void StartAudio(AudioHandle::InterleavingAudioCallback cb);
 
     /** Starts the callback
-    \cb multichannel callback function
+    \param cb multichannel callback function
     */
     void StartAudio(AudioHandle::AudioCallback cb);
 
@@ -184,6 +184,7 @@ class DaisyPetal
     Led    footswitch_led[4]; /**< & */
 
   private:
+    void SetHidUpdateRates();
     void InitSwitches();
     void InitEncoder();
     void InitLeds();

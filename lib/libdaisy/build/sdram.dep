@@ -1,4 +1,4 @@
-build/src/dev/sdram.o: src/dev/sdram.c \
+build/src/dev/sdram.o: src/dev/sdram.cpp \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h \
  src/sys/stm32h7xx_hal_conf.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h \
@@ -17,6 +17,13 @@ build/src/dev/sdram.o: src/dev/sdram.c \
  Drivers/CMSIS/Device/ST/STM32H7xx/Include/system_stm32h7xx.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
  /Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/math.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cmath \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/c++config.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/os_defines.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/cpu_defines.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/cpp_type_traits.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/ext/type_traits.h \
  /Applications/ARM/arm-none-eabi/include/math.h \
  /Applications/ARM/arm-none-eabi/include/sys/reent.h \
  /Applications/ARM/arm-none-eabi/include/_ansi.h \
@@ -28,6 +35,10 @@ build/src/dev/sdram.o: src/dev/sdram.c \
  /Applications/ARM/arm-none-eabi/include/sys/lock.h \
  /Applications/ARM/arm-none-eabi/include/sys/cdefs.h \
  /Applications/ARM/arm-none-eabi/include/_ansi.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h \
+ /Applications/ARM/arm-none-eabi/include/stdlib.h \
+ /Applications/ARM/arm-none-eabi/include/machine/stdlib.h \
+ /Applications/ARM/arm-none-eabi/include/alloca.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio_ex.h \
@@ -111,9 +122,10 @@ build/src/dev/sdram.o: src/dev/sdram.c \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_hcd.h src/dev/sdram.h \
- src/daisy_core.h /Applications/ARM/arm-none-eabi/include/stdlib.h \
- /Applications/ARM/arm-none-eabi/include/machine/stdlib.h \
- /Applications/ARM/arm-none-eabi/include/alloca.h src/util/hal_map.h
+ src/daisy_core.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/stdlib.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdlib \
+ src/util/hal_map.h
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
 src/sys/stm32h7xx_hal_conf.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h:
@@ -133,6 +145,13 @@ Drivers/CMSIS/Include/cmsis_gcc.h:
 Drivers/CMSIS/Device/ST/STM32H7xx/Include/system_stm32h7xx.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:
 /Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/math.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/cmath:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/c++config.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/os_defines.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+dp/hard/bits/cpu_defines.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/cpp_type_traits.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/ext/type_traits.h:
 /Applications/ARM/arm-none-eabi/include/math.h:
 /Applications/ARM/arm-none-eabi/include/sys/reent.h:
 /Applications/ARM/arm-none-eabi/include/_ansi.h:
@@ -144,6 +163,10 @@ Drivers/STM32H7xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:
 /Applications/ARM/arm-none-eabi/include/sys/lock.h:
 /Applications/ARM/arm-none-eabi/include/sys/cdefs.h:
 /Applications/ARM/arm-none-eabi/include/_ansi.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h:
+/Applications/ARM/arm-none-eabi/include/stdlib.h:
+/Applications/ARM/arm-none-eabi/include/machine/stdlib.h:
+/Applications/ARM/arm-none-eabi/include/alloca.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc_ex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio_ex.h:
@@ -229,7 +252,6 @@ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_hcd.h:
 src/dev/sdram.h:
 src/daisy_core.h:
-/Applications/ARM/arm-none-eabi/include/stdlib.h:
-/Applications/ARM/arm-none-eabi/include/machine/stdlib.h:
-/Applications/ARM/arm-none-eabi/include/alloca.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/stdlib.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdlib:
 src/util/hal_map.h:

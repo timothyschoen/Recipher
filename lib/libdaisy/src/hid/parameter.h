@@ -38,6 +38,8 @@ class Parameter
     \return  a float with the specified transformation applied.
     */
     float Process();
+    
+    float Process(float input);
 
     /** 
     \return the current value from the parameter without processing another sample.

@@ -30,9 +30,6 @@ build/src/util/WaveTableLoader.o: src/util/WaveTableLoader.cpp \
  /Applications/ARM/arm-none-eabi/include/machine/stdlib.h \
  /Applications/ARM/arm-none-eabi/include/alloca.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h \
- Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
- Middlewares/Third_Party/FatFs/src/diskio.h \
- Middlewares/Third_Party/FatFs/src/ff.h src/util/sd_diskio.h \
  src/util/wav_format.h src/daisy_core.h
 src/util/WaveTableLoader.h:
 src/sys/fatfs.h:
@@ -67,9 +64,5 @@ src/util/bsp_sd_diskio.h:
 /Applications/ARM/arm-none-eabi/include/machine/stdlib.h:
 /Applications/ARM/arm-none-eabi/include/alloca.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h:
-Middlewares/Third_Party/FatFs/src/ff_gen_drv.h:
-Middlewares/Third_Party/FatFs/src/diskio.h:
-Middlewares/Third_Party/FatFs/src/ff.h:
-src/util/sd_diskio.h:
 src/util/wav_format.h:
 src/daisy_core.h:

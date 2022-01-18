@@ -5,6 +5,20 @@
 
 namespace daisy
 {
+/** @brief Audio Engine Handle
+ *  @ingroup audio 
+ *  @details This class allows for higher level access to an audio engine.
+ *           If you're using a SOM like the DaisySeed or DaisyPatchSM (or any 
+ *            board that includes one of those objects) then the intialization
+ *            is already taken  care of.
+ *           If you're setting up your own custom hardware, or need to make changes
+ *           you will have to take the following steps:
+ *             1. Create and Initialize an SaiHandle or two depending on your requirements
+ *             2. Initialize the Audio Handle with the desired settings and the Initialized SaiHandle
+ *             3. If the connected codec requires special configuration or initialization, do so
+ *             4. Write a callback method using either the AudioCallback or the InterleavingAudioCallback format
+ *             5. Start the Audio using one of the StartAudio function
+ */
 class AudioHandle
 {
   public:
@@ -23,15 +37,41 @@ class AudioHandle
         ERR,
     };
 
-    /** Non-Interleaving Callback format. Both arrays arranged by float[chn][sample] */
-    typedef void (*AudioCallback)(float** in, float** out, size_t size);
-
-    /** Non-Interleaving Callback format. 
-     ** audio is prepared as { L0, R0, L1, R1, . . . LN, RN }
+    /** Non-Interleaving input buffer
+     * Buffer arranged by float[chn][sample] 
+     * const so that the user can't modify the input
      */
-    typedef void (*InterleavingAudioCallback)(float* in,
-                                              float* out,
-                                              size_t size);
+    typedef const float* const* InputBuffer;
+
+    /** Non-Interleaving output buffer
+     * Arranged by float[chn][sample] 
+     */
+    typedef float** OutputBuffer;
+
+    /** Type for a Non-Interleaving audio callback 
+     * Non-Interleaving audio callbacks in daisy will be of this type
+     */
+    typedef void (*AudioCallback)(InputBuffer  in,
+                                  OutputBuffer out,
+                                  size_t       size);
+
+    /** Interleaving Input buffer
+     ** audio is prepared as { L0, R0, L1, R1, . . . LN, RN }]
+     ** this is const, as the user shouldn't modify it
+    */
+    typedef const float* InterleavingInputBuffer;
+
+    /** Interleaving Output buffer 
+     ** audio is prepared as { L0, R0, L1, R1, . . . LN, RN }
+    */
+    typedef float* InterleavingOutputBuffer;
+
+    /** Interleaving Audio Callback 
+     * Interleaving audio callbacks in daisy must be of this type
+     */
+    typedef void (*InterleavingAudioCallback)(InterleavingInputBuffer  in,
+                                              InterleavingOutputBuffer out,
+                                              size_t                   size);
 
     AudioHandle() : pimpl_(nullptr) {}
     ~AudioHandle() {}
@@ -44,6 +84,9 @@ class AudioHandle
 
     /** Initializes audio to run using two SAI, each configured in Stereo I2S mode. */
     Result Init(const Config& config, SaiHandle sai1, SaiHandle sai2);
+
+    /** Stops and deinitializes audio. */
+    Result DeInit();
 
     /** Returns the Global Configuration struct for the Audio */
     const Config& GetConfig() const;

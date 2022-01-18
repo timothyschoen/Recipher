@@ -27,7 +27,8 @@ build/src/hid/encoder.o: src/hid/encoder.cpp src/hid/encoder.h \
  /Applications/ARM/arm-none-eabi/include/machine/stdlib.h \
  /Applications/ARM/arm-none-eabi/include/alloca.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h \
- src/per/gpio.h src/hid/switch.h
+ src/per/gpio.h src/hid/switch.h src/sys/system.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdint src/per/tim.h
 src/hid/encoder.h:
 src/daisy_core.h:
 /Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h:
@@ -59,3 +60,6 @@ src/daisy_core.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h:
 src/per/gpio.h:
 src/hid/switch.h:
+src/sys/system.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdint:
+src/per/tim.h:

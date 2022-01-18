@@ -26,6 +26,7 @@ build/src/per/spi.o: src/per/spi.cpp src/per/spi.h src/daisy_core.h \
  /Applications/ARM/arm-none-eabi/include/machine/stdlib.h \
  /Applications/ARM/arm-none-eabi/include/alloca.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h \
+ src/util/scopedirqblocker.h Drivers/CMSIS/Include/cmsis_gcc.h \
  src/util/hal_map.h Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h \
  src/sys/stm32h7xx_hal_conf.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h \
@@ -153,6 +154,8 @@ src/daisy_core.h:
 /Applications/ARM/arm-none-eabi/include/machine/stdlib.h:
 /Applications/ARM/arm-none-eabi/include/alloca.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h:
+src/util/scopedirqblocker.h:
+Drivers/CMSIS/Include/cmsis_gcc.h:
 src/util/hal_map.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
 src/sys/stm32h7xx_hal_conf.h:

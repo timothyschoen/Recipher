@@ -27,7 +27,7 @@ build/src/daisy_pod.o: src/daisy_pod.cpp src/daisy_pod.h src/daisy_seed.h \
  /Applications/ARM/arm-none-eabi/include/machine/stdlib.h \
  /Applications/ARM/arm-none-eabi/include/alloca.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h \
- src/sys/system.h \
+ src/version.h src/sys/system.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdint src/per/tim.h \
  src/per/qspi.h src/per/dac.h src/per/gpio.h src/dev/leddriver.h \
  src/per/i2c.h src/dev/sdram.h src/dev/sr_4021.h src/sys/system.h \
@@ -69,8 +69,9 @@ build/src/daisy_pod.o: src/daisy_pod.cpp src/daisy_pod.h src/daisy_seed.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/nested_exception.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/uniform_int_dist.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/limits \
- src/hid/encoder.h src/hid/switch.h src/hid/switch3.h src/hid/ctrl.h \
- src/hid/gatein.h src/hid/parameter.h src/hid/usb.h src/hid/logger.h \
+ src/hid/MidiEvent.h src/hid/usb_midi.h src/hid/usb.h src/hid/encoder.h \
+ src/hid/switch.h src/hid/switch3.h src/hid/ctrl.h src/hid/gatein.h \
+ src/hid/parameter.h src/hid/logger.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cmath \
  /Applications/ARM/arm-none-eabi/include/math.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdarg \
@@ -92,19 +93,30 @@ build/src/daisy_pod.o: src/daisy_pod.cpp src/daisy_pod.h src/daisy_seed.h \
  src/hid/logger_impl.h /Applications/ARM/arm-none-eabi/include/unistd.h \
  /Applications/ARM/arm-none-eabi/include/sys/unistd.h \
  /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cassert \
- /Applications/ARM/arm-none-eabi/include/assert.h src/per/sdmmc.h \
- src/per/spi.h src/hid/oled_display.h src/util/oled_fonts.h \
- src/hid/wavplayer.h src/util/wav_format.h src/hid/led.h \
- src/hid/rgb_led.h src/util/color.h src/dev/sr_595.h \
- src/dev/codec_pcm3060.h src/dev/codec_wm8731.h src/dev/lcd_hd44780.h \
- src/util/scopedirqblocker.h Drivers/CMSIS/Include/cmsis_gcc.h \
- src/util/WaveTableLoader.h src/sys/fatfs.h \
+ /Applications/ARM/arm-none-eabi/include/assert.h src/hid/usb_host.h \
+ src/per/sdmmc.h src/per/spi.h src/per/rng.h src/hid/disp/display.h \
+ src/util/oled_fonts.h src/hid/disp/graphics_common.h \
+ src/hid/disp/oled_display.h src/hid/wavplayer.h src/util/wav_format.h \
  Middlewares/Third_Party/FatFs/src/ff.h \
  Middlewares/Third_Party/FatFs/src/integer.h src/sys/ffconf.h \
- src/util/bsp_sd_diskio.h Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
- Middlewares/Third_Party/FatFs/src/diskio.h \
- Middlewares/Third_Party/FatFs/src/ff.h src/util/sd_diskio.h \
- src/util/WavWriter.h
+ src/util/bsp_sd_diskio.h src/hid/led.h src/hid/rgb_led.h \
+ src/util/color.h src/dev/sr_595.h src/dev/codec_pcm3060.h \
+ src/dev/codec_wm8731.h src/dev/lcd_hd44780.h src/dev/mcp23x17.h \
+ src/dev/max11300.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstring \
+ /Applications/ARM/arm-none-eabi/include/string.h \
+ /Applications/ARM/arm-none-eabi/include/sys/_locale.h \
+ /Applications/ARM/arm-none-eabi/include/strings.h \
+ /Applications/ARM/arm-none-eabi/include/sys/string.h \
+ src/ui/ButtonMonitor.h src/ui/UiEventQueue.h src/ui/../util/FIFO.h \
+ src/ui/../util/scopedirqblocker.h Drivers/CMSIS/Include/cmsis_gcc.h \
+ src/ui/../sys/system.h src/ui/PotMonitor.h src/ui/UI.h \
+ src/ui/../util/Stack.h src/ui/AbstractMenu.h src/util/MappedValue.h \
+ src/util/FixedCapStr.h \
+ /Applications/ARM/arm-none-eabi/include/c++/10.3.1/string_view \
+ src/ui/FullScreenItemMenu.h src/util/CpuLoadMeter.h \
+ src/util/PersistentStorage.h src/per/qspi.h src/util/VoctCalibration.h \
+ src/util/WaveTableLoader.h src/sys/fatfs.h src/util/WavWriter.h
 src/daisy_pod.h:
 src/daisy_seed.h:
 src/daisy.h:
@@ -136,6 +148,7 @@ src/daisy_core.h:
 /Applications/ARM/arm-none-eabi/include/machine/stdlib.h:
 /Applications/ARM/arm-none-eabi/include/alloca.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h:
+src/version.h:
 src/sys/system.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstdint:
 src/per/tim.h:
@@ -190,13 +203,15 @@ src/util/ringbuffer.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/nested_exception.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/bits/uniform_int_dist.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/limits:
+src/hid/MidiEvent.h:
+src/hid/usb_midi.h:
+src/hid/usb.h:
 src/hid/encoder.h:
 src/hid/switch.h:
 src/hid/switch3.h:
 src/hid/ctrl.h:
 src/hid/gatein.h:
 src/hid/parameter.h:
-src/hid/usb.h:
 src/hid/logger.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cmath:
 /Applications/ARM/arm-none-eabi/include/math.h:
@@ -221,12 +236,20 @@ src/hid/logger_impl.h:
 /Applications/ARM/arm-none-eabi/include/sys/unistd.h:
 /Applications/ARM/arm-none-eabi/include/c++/10.3.1/cassert:
 /Applications/ARM/arm-none-eabi/include/assert.h:
+src/hid/usb_host.h:
 src/per/sdmmc.h:
 src/per/spi.h:
-src/hid/oled_display.h:
+src/per/rng.h:
+src/hid/disp/display.h:
 src/util/oled_fonts.h:
+src/hid/disp/graphics_common.h:
+src/hid/disp/oled_display.h:
 src/hid/wavplayer.h:
 src/util/wav_format.h:
+Middlewares/Third_Party/FatFs/src/ff.h:
+Middlewares/Third_Party/FatFs/src/integer.h:
+src/sys/ffconf.h:
+src/util/bsp_sd_diskio.h:
 src/hid/led.h:
 src/hid/rgb_led.h:
 src/util/color.h:
@@ -234,16 +257,31 @@ src/dev/sr_595.h:
 src/dev/codec_pcm3060.h:
 src/dev/codec_wm8731.h:
 src/dev/lcd_hd44780.h:
-src/util/scopedirqblocker.h:
+src/dev/mcp23x17.h:
+src/dev/max11300.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/cstring:
+/Applications/ARM/arm-none-eabi/include/string.h:
+/Applications/ARM/arm-none-eabi/include/sys/_locale.h:
+/Applications/ARM/arm-none-eabi/include/strings.h:
+/Applications/ARM/arm-none-eabi/include/sys/string.h:
+src/ui/ButtonMonitor.h:
+src/ui/UiEventQueue.h:
+src/ui/../util/FIFO.h:
+src/ui/../util/scopedirqblocker.h:
 Drivers/CMSIS/Include/cmsis_gcc.h:
+src/ui/../sys/system.h:
+src/ui/PotMonitor.h:
+src/ui/UI.h:
+src/ui/../util/Stack.h:
+src/ui/AbstractMenu.h:
+src/util/MappedValue.h:
+src/util/FixedCapStr.h:
+/Applications/ARM/arm-none-eabi/include/c++/10.3.1/string_view:
+src/ui/FullScreenItemMenu.h:
+src/util/CpuLoadMeter.h:
+src/util/PersistentStorage.h:
+src/per/qspi.h:
+src/util/VoctCalibration.h:
 src/util/WaveTableLoader.h:
 src/sys/fatfs.h:
-Middlewares/Third_Party/FatFs/src/ff.h:
-Middlewares/Third_Party/FatFs/src/integer.h:
-src/sys/ffconf.h:
-src/util/bsp_sd_diskio.h:
-Middlewares/Third_Party/FatFs/src/ff_gen_drv.h:
-Middlewares/Third_Party/FatFs/src/diskio.h:
-Middlewares/Third_Party/FatFs/src/ff.h:
-src/util/sd_diskio.h:
 src/util/WavWriter.h:

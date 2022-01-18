@@ -2,6 +2,7 @@
 #ifndef DSY_FIELD_BSP_H
 #define DSY_FIELD_BSP_H /**< & */
 #include "daisy_seed.h"
+#include "dev/oled_ssd130x.h"
 
 /**
    @brief Hardware defines and helpers for daisy field platform.
@@ -92,12 +93,12 @@ class DaisyField
     void DelayMs(size_t del);
 
     /** Starts the callback
-    \cb Interleaved callback function
+    \param cb Interleaved callback function
     */
     void StartAudio(AudioHandle::InterleavingAudioCallback cb);
 
     /** Starts the callback
-    \cb multichannel callback function
+    \param cb multichannel callback function
     */
     void StartAudio(AudioHandle::AudioCallback cb);
 
@@ -209,16 +210,21 @@ class DaisyField
      **/
     void VegasMode();
 
-    DaisySeed                 seed;
-    OledDisplay               display;
-    dsy_gpio                  gate_out;
-    GateIn                    gate_in;
-    LedDriverPca9685<2, true> led_driver;
-    Switch                    sw[SW_LAST];
-    AnalogControl             knob[KNOB_LAST];
-    AnalogControl             cv[CV_LAST];
+    DaisySeed                                seed;
+    OledDisplay<SSD130x4WireSpi128x64Driver> display;
+    dsy_gpio                                 gate_out;
+    GateIn                                   gate_in;
+    LedDriverPca9685<2, true>                led_driver;
+    Switch                                   sw[SW_LAST];
+    AnalogControl                            knob[KNOB_LAST];
+    AnalogControl                            cv[CV_LAST];
+    MidiUartHandler                          midi;
 
   private:
+    /** Set all the HID callback rates any time a new callback rate is established */
+    void SetHidUpdateRates();
+    void InitMidi();
+
     ShiftRegister4021<2> keyboard_sr_; /**< Two 4021s daisy-chained. */
     uint8_t              keyboard_state_[16];
     uint32_t             last_led_update_; // for vegas mode

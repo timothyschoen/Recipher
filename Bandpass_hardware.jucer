@@ -3,7 +3,7 @@
 <JUCERPROJECT id="FaVHsK" name="Bandpass_hardware" projectType="audioplug"
               useAppConfig="0" addUsingNamespaceToJuceHeader="1" displaySplashScreen="1"
               jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
-              cppLanguageStandard="17" headerPath="/opt/homebrew/include" pluginVSTCategory="kPlugCategEffect">
+              cppLanguageStandard="17" headerPath="/opt/homebrew/include" pluginVSTCategory="kPlugCategSynth">
   <MAINGROUP id="qrd2zy" name="Bandpass_hardware">
     <GROUP id="{B4CBB212-6188-81F5-3E09-2DE9F2780E7F}" name="src">
       <GROUP id="{1BD2872D-BBB0-778B-1445-5C9914F01C91}" name="midi"/>

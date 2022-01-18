@@ -44,12 +44,12 @@ class DaisyPod
     void DelayMs(size_t del);
 
     /** Starts the callback
-    \cb Interleaved callback function
+    \param cb Interleaved callback function
     */
     void StartAudio(AudioHandle::InterleavingAudioCallback cb);
 
     /** Starts the callback
-    \cb multichannel callback function
+    \param cb multichannel callback function
     */
     void StartAudio(AudioHandle::AudioCallback cb);
 
@@ -128,12 +128,15 @@ class DaisyPod
         *buttons[BUTTON_LAST]; /**< & */
     RgbLed led1,               /**< & */
         led2;                  /**< & */
+    MidiUartHandler midi;
 
   private:
+    void SetHidUpdateRates();
     void InitButtons();
     void InitEncoder();
     void InitLeds();
     void InitKnobs();
+    void InitMidi();
 };
 
 } // namespace daisy

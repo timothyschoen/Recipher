@@ -33,3 +33,25 @@ float Parameter::Process()
     }
     return val_;
 }
+
+
+float Parameter::Process(float value)
+{
+    switch(pcurve_)
+    {
+        case LINEAR: val_ = (value * (pmax_ - pmin_)) + pmin_; break;
+        case EXPONENTIAL:
+            val_ = value;
+            val_ = ((val_ * val_) * (pmax_ - pmin_)) + pmin_;
+            break;
+        case LOGARITHMIC:
+            val_ = expf((value * (lmax_ - lmin_)) + lmin_);
+            break;
+        case CUBE:
+            val_ = value;
+            val_ = ((val_ * (val_ * val_)) * (pmax_ - pmin_)) + pmin_;
+            break;
+        default: break;
+    }
+    return val_;
+}
