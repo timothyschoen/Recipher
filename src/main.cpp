@@ -194,7 +194,7 @@ class VoiceManager
     }
     
     void update_filters() {
-        for(auto& voice : voices) voice.update_filters();
+        for(auto& voice : voices) voice.filter.update_filter();
     }
 
   private:
