@@ -25,7 +25,7 @@ enum ParameterPin
     SUSTAIN,
     RELEASE,
     
-    GAIN = 15,
+    GAIN = 25,
     FEEDBACK,
     DELAY,
     STRETCH,
@@ -51,18 +51,21 @@ extern DaisySeed sculpt;
 
 struct SculptParameter
 {
-
     SculptParameter(ParameterInit init){
         
+        // Get parameter pin, range, init and scaling
         auto [pin1, min1, max1, init1, scale1] = init[0];
         auto [pin2, min2, max2, init2, scale2] = init[1];
         
+        // Initialise ADC
         control.Init(sculpt.adc.GetPtr((int)pin1 - 15), sculpt.AudioSampleRate() / 256.0f);
-        control.SetCoeff (1.0f);
+        control.SetCoeff (0.5f);
         
+        // Initialise Daisy control scaling
         parameters[0].Init(control, min1, max1, scale1);
         parameters[1].Init(control, min2, max2, scale2);
         
+        // load initial value
         if(shift) {
             last_value[1] = init1;
             last_value[0] = control.Process();
@@ -73,59 +76,66 @@ struct SculptParameter
         }
     }
     
-    void update_touched(bool new_shift) {
-        if(new_shift != shift)  {
-            touched = false;
-        }
-    }
-    
-    
+
+    // Gets parameter value
     float process(bool wanted_shift) {
+        
+        // If the current shift is wanted
         if(wanted_shift == shift) {
+            
+            // Get value scaled from 0-1 from adc
             float in_val = control.Process();
             
-            
+            // If it's close the the last recorded value, set touched to true
             if(abs(last_value[shift] - in_val) < 0.1) touched = true;
             
+            // If the value hasn't been touched since the last shift change, return the last known value
             if(!touched) {
+                // Return last value with scaling
                 return parameters[shift].Process(last_value[shift]);
             }
                         
+            // If it has been touched, set last value to the current value
             last_value[shift] = in_val;
             
-            return parameters[shift].Process(last_value[shift]);
+            // Return the current adc value with scaling
+            return parameters[shift].Process(in_val);
         }
+        // If the unselected shift is wanted, return the last known value
         else {
+            // Return last value with scaling
             return parameters[wanted_shift].Process(last_value[wanted_shift]);
         }
     }
     
     static inline bool shift = false;
-
-    std::array<Parameter, 2> parameters;
+    bool touched = true;
+    
+    Parameter parameters[2];
     
 private:
     
-    bool touched = true;
-
     AnalogControl control;
 
-    std::array<float, 2> last_value;
-    
+    float last_value[2];
 };
 
 
-std::vector<SculptParameter> sculpt_parameters;
 
 struct SculptParameters
 {
-
-    static void init() {
+    static std::vector<SculptParameter> sculpt_parameters;
+    
+    static void init(bool shift) {
         
+        SculptParameter::shift = shift;
+        
+        // Initialise parameters
+        // Make sure the adc is initialised before calling this!
         sculpt_parameters = {
             SculptParameter({{MIX, 0.0f, 1.0f, 0.5f, Linear},            {GAIN, 1.0f, 4.0f, 0.5f, Linear}}),
             SculptParameter({{LPF_Q, 0.0f, 0.99f, 0.5f, Linear},         {FEEDBACK, 0.0f, 0.99f, 0.0f, Linear}}),
-            SculptParameter({{LPF_HZ, 30.0f, 9000.0f, 0.7f, ExpScale},   {DELAY, 1.0f, 20000.0f, 0.1f, Linear}}),
+            SculptParameter({{LPF_HZ, 30.0f, 9000.0f, 0.7f, ExpScale},   {DELAY, 128.0f, 20000.0f, 0.1f, Linear}}),
             SculptParameter({{SHAPE, 0.0f, 3.0f, 0.75f, Linear},         {STRETCH, 0.0f, 2.0f, 0.5f, Linear}}),
             SculptParameter({{Q, 0.4f, 30.0f, 0.5f, ExpScale},           {FREEZE_SIZE, 64.0f, 8192.0f, 0.5f, Linear}}),
             SculptParameter({{SUB, 0.0f, 1.0f, 0.5f, Linear},            {DRIVE, 1.4f, 128.0f, 0.0f, Linear}}),
@@ -134,20 +144,28 @@ struct SculptParameters
             SculptParameter({{SUSTAIN, 0.0f, 1.0f, 0.3f, Linear},        {LFO_DEPTH, -1.0f, 1.0f, 0.5f, Linear}}),
             SculptParameter({{RELEASE, 5.0f, 4000.0f, 0.2f, ExpScale},   {LFO_DEST, 0.0f, 2.0f, 0.5f, Linear}})};
     }
-    
-    
    
-    static void set_shift(bool new_shift) {
+    static void set_shift(bool shift) {
         
+        // Check if changed
+        if(SculptParameter::shift == shift) return;
+        
+        // When changing shift
         for(auto& param : sculpt_parameters) {
-            param.update_touched(new_shift);
+            param.touched = false;
         }
         
-        SculptParameter::shift = new_shift;
+        SculptParameter::shift = shift;
     }
 
-    static float get_value(ParameterPin pin, bool shift_page) {
-        return sculpt_parameters[(int)pin - 15].process(shift_page);
+    static float get_value(ParameterPin pin) {
+        
+        if(pin >= 25)  {
+            return sculpt_parameters[(int)pin - 25].process(true);
+        }
+        else {
+            return sculpt_parameters[(int)pin - 15].process(false);
+        }
     }
 
 };

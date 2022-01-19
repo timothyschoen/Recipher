@@ -79,19 +79,20 @@ class Adsr
     inline bool IsRunning() const { return mode_ != ADSR_SEG_IDLE; }
 
   private:
-    float   sus_level_{0.f};
-    float   x_{0.f};
-    float   attackShape_{-1.f};
-    float   attackTarget_{0.0f};
-    float   attackTime_{-1.0f};
-    float   decayTime_{-1.0f};
-    float   releaseTime_{-1.0f};
-    float   attackD0_{0.f};
-    float   decayD0_{0.f};
-    float   releaseD0_{0.f};
+    
+    float   sus_level_ = 0.f;
+    float   x_ = 0.f;
+    float   attackShape_ = -1.f;
+    float   attackTarget_ = 0.0f;
+    float   attackTime_ = -1.0f;
+    float   decayTime_= -1.0f;
+    float   releaseTime_ = -1.0f;
+    float   attackD0_ = 0.f;
+    float   decayD0_ = 0.f;
+    float   releaseD0_ = 0.f;
     int     sample_rate_;
-    uint8_t mode_{ADSR_SEG_IDLE};
-    bool    gate_{false};
+    uint8_t mode_ = ADSR_SEG_IDLE;
+    bool    gate_ = false;
 };
 } // namespace daisysp
 #endif

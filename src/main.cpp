@@ -17,7 +17,7 @@ Led led;
 
 Svf filt;
 LFO lfo;
-Freeze freeze = Freeze(44100);
+Freeze<44100> freeze;
 DelayLine<float, 44100> delay;
 
 class Voice
@@ -233,7 +233,7 @@ class VoiceManager
     }
 };
 
-static VoiceManager<7> voice_handler;
+static VoiceManager<6> voice_handler;
 
 static float trig = 0;
 
@@ -300,34 +300,37 @@ float lpf_cutoff = 18000.0f;
 
 void update_parameters() {
     
-    SculptParameters::set_shift(switches[0].Process() > 0.1);
+    bool shift = switches[0].Process() > 0.1;
     
-    freeze.set_freeze(switches[1].Process() > 0.1);
+    SculptParameters::set_shift(shift);
     
-    noise_mix = SculptParameters::get_value(MIX, false);
-    
-    filt.SetRes(SculptParameters::get_value(LPF_Q, false));
-    lpf_cutoff = SculptParameters::get_value(LPF_HZ, false);
-    
-    voice_handler.set_q(SculptParameters::get_value(Q, false));
-    voice_handler.set_shape(SculptParameters::get_value(SHAPE, false));
-    voice_handler.set_sub(SculptParameters::get_value(SUB, false));
-    
-    voice_handler.set_attack(SculptParameters::get_value(ATTACK, false));
-    voice_handler.set_decay(SculptParameters::get_value(DECAY, false));
-    voice_handler.set_sustain(SculptParameters::get_value(SUSTAIN, false));
-    voice_handler.set_release(SculptParameters::get_value(RELEASE, false));
-    
-    input_gain = SculptParameters::get_value(GAIN, true);
-    feedback = SculptParameters::get_value(FEEDBACK, true);
-    delay_samples = SculptParameters::get_value(DELAY, true);
-    voice_handler.set_stretch(SculptParameters::get_value(STRETCH, true) + stretch_mod);
-    freeze.set_freeze_size(SculptParameters::get_value(FREEZE_SIZE, true));
-    drive = SculptParameters::get_value(DRIVE, true);
-    lfo.set_shape(SculptParameters::get_value(LFO_SHAPE, true));
-    lfo.set_frequency(SculptParameters::get_value(LFO_RATE, true));
-    lfo_depth = SculptParameters::get_value(LFO_DEPTH, true);
-    lfo_destination = SculptParameters::get_value(LFO_DEST, true);
+
+        freeze.set_freeze(switches[1].Process() > 0.1);
+        
+        noise_mix = SculptParameters::get_value(MIX);
+        
+        filt.SetRes(SculptParameters::get_value(LPF_Q));
+        lpf_cutoff = SculptParameters::get_value(LPF_HZ);
+        
+        voice_handler.set_q(SculptParameters::get_value(Q));
+        voice_handler.set_shape(SculptParameters::get_value(SHAPE));
+        voice_handler.set_sub(SculptParameters::get_value(SUB));
+        
+        voice_handler.set_attack(SculptParameters::get_value(ATTACK));
+        voice_handler.set_decay(SculptParameters::get_value(DECAY));
+        voice_handler.set_sustain(SculptParameters::get_value(SUSTAIN));
+        voice_handler.set_release(SculptParameters::get_value(RELEASE));
+
+        input_gain = SculptParameters::get_value(GAIN);
+        feedback = SculptParameters::get_value(FEEDBACK);
+        delay_samples = SculptParameters::get_value(DELAY);
+        voice_handler.set_stretch(SculptParameters::get_value(STRETCH) + stretch_mod);
+        freeze.set_freeze_size(SculptParameters::get_value(FREEZE_SIZE));
+        drive = SculptParameters::get_value(DRIVE);
+        lfo.set_shape(SculptParameters::get_value(LFO_SHAPE));
+        lfo.set_frequency(SculptParameters::get_value(LFO_RATE));
+        lfo_depth = SculptParameters::get_value(LFO_DEPTH);
+        lfo_destination = SculptParameters::get_value(LFO_DEST);
     
     voice_handler.update_filters();
 }
@@ -373,7 +376,12 @@ template <typename FloatType>
 void audio_callback(const float* const* in, float** out, size_t size)
 {
     float synth_out;
-
+    
+    midi.Listen();
+    while(midi.HasEvents())
+    {
+        HandleMidiMessage(midi.PopEvent());
+    }
     
     update_parameters();
     led.Update();
@@ -440,11 +448,10 @@ int main(void)
     switches[0].Init(sculpt.adc.GetPtr(num_potmeters), sample_rate  / 256.0f);
     switches[1].Init(sculpt.adc.GetPtr(num_potmeters + 1), sample_rate / 256.0f);
 
-    switches[0].SetCoeff (0.1);
-    switches[1].SetCoeff (0.1);
+    switches[0].SetCoeff(0.01f);
+    switches[1].SetCoeff(0.01f);
     
-    
-    SculptParameters::init();
+    SculptParameters::init(switches[0].Process() > 0.1);
     sculpt.adc.Start();
     
     
@@ -460,18 +467,14 @@ int main(void)
     
     voice_handler.Init(sample_rate);
     
+    midi.StartReceive();
+    
     // start callback
     sculpt.StartAudio(audio_callback);
-    midi.StartReceive();
 
-    while(1)
-    {
-        midi.Listen();
-        while(midi.HasEvents())
-        {
-            HandleMidiMessage(midi.PopEvent());
-        }
-        
-        System::Delay(1);
+
+    while(true) {
+        System::Delay(std::numeric_limits<int>::max());
     }
+    
 }

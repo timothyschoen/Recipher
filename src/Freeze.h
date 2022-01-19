@@ -1,23 +1,18 @@
 
+template<int max_length>
 struct Freeze
 {
-    
-    Freeze(int max_length) {
-        
+    Freeze() {
         max_sample_len = max_length;
         read_head = 0;
         write_head = 0;
         prev_input = 0;
-        playpack_rate = 65536;
-        accumulator = 0;
         sample_loaded = false;
-        sample_bank.resize(max_length);
         set_freeze_size(std::min(512, max_length));
     }
     
     
     void set_freeze(bool frozen) {
-        
         if(frozen != freeze) {
             freeze = frozen;
             sample_loaded = false;
@@ -31,10 +26,8 @@ struct Freeze
         freeze_len = std::min<int>(grain_samples, max_sample_len);
     }
     
-    
     float process(float input)
     {
-        
         float output = 0;
         
         if(!freeze) {
@@ -55,38 +48,26 @@ struct Freeze
                 prev_input = input;
             }
         }
+        
         if (write_en) {
             sample_bank[write_head++] = input;
-            if (write_head >= freeze_len) {
-                sample_loaded = true;
-            }
-            if (write_head >= max_sample_len) {
-                write_en = false;
-            }
+            if (write_head >= freeze_len)     sample_loaded = true;
+            if (write_head >= max_sample_len) write_en = false;
         }
+        
         if (sample_loaded) {
-            
-            if (playpack_rate >= 0) {
-                accumulator += playpack_rate;
-                read_head = accumulator >> 16;
-            }
             if (read_head >= freeze_len) {
-                accumulator = 0;
-                read_head = 0;
+                read_head -= freeze_len;
             }
+            
+            read_head++;
             output = sample_bank[read_head];
         }
         
         return output;
     }
 
-    
-    //std::array<float, 512> inputQueueArray[1];
-    
-    
-    std::vector<float> sample_bank;
-    int playpack_rate;
-    int accumulator;
+    float sample_bank[max_length];
     int max_sample_len;
     int write_head;
     int read_head;

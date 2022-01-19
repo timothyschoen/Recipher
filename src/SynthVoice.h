@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 #include <tuple>
 #include <algorithm>
 
@@ -17,11 +16,8 @@ using FilterState = std::pair<float, float>;
 
 struct ShapeFilter
 {
-    std::vector<std::vector<float>> shape_harmonics;
     
     ShapeFilter() {
-        shape_harmonics.resize((int)Shape::NumShapes, std::vector<float>(num_harmonics, 0.0f));
-        
         // Initialise harmonics for each shape
         for(int i = 0; i < num_harmonics; i++) {
             int overtone = i + 1;
@@ -159,7 +155,9 @@ struct ShapeFilter
 private:
     
     static constexpr int num_harmonics = 5;
-    static constexpr int cascade = 2;
+    static constexpr int cascade = 3;
+    
+    float shape_harmonics[(int)Shape::NumShapes][num_harmonics];
     
     float freq = 100.0f;
     float q = 2.0f;

@@ -46,8 +46,13 @@ private:
     float phase = 0.0f;
     float twoPI = 2.0f * M_PI;
 
+    // fast sine approximation
     float sine() {
-        return sin(phase * twoPI);
+        auto x = phase * twoPI;
+        auto x2 = x * x;
+        auto numerator = -x * (-11511339840 + x2 * (1640635920 + x2 * (-52785432 + x2 * 479249)));
+        auto denominator = 11511339840 + x2 * (277920720 + x2 * (3177720 + x2 * 18361));
+        return numerator / denominator;
     }
     
     float sawtooth() {
