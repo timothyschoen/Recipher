@@ -1,7 +1,7 @@
 #include "daisysp.h"
 #include "daisy_seed.h"
 
-#include "SynthVoice.h"
+#include "ShapeFilter.h"
 #include "Freeze.h"
 #include "Parameters.h"
 #include "LFO.h"
