@@ -36,7 +36,7 @@
 #include "hid/disp/display.h"
 #include "hid/disp/oled_display.h"
 #include "hid/disp/graphics_common.h"
-#include "hid/wavplayer.h"
+//#include "hid/wavplayer.h"
 #include "hid/led.h"
 #include "hid/rgb_led.h"
 #include "dev/sr_595.h"
@@ -45,6 +45,7 @@
 #include "dev/lcd_hd44780.h"
 #include "dev/mcp23x17.h"
 #include "dev/max11300.h"
+/*
 #include "ui/ButtonMonitor.h"
 #include "ui/PotMonitor.h"
 #include "ui/UI.h"
@@ -60,6 +61,6 @@
 #include "util/Stack.h"
 #include "util/VoctCalibration.h"
 #include "util/WaveTableLoader.h"
-#include "util/WavWriter.h"
+#include "util/WavWriter.h"*/
 #endif
 #endif

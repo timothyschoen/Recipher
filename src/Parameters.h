@@ -1,4 +1,4 @@
-
+#pragma once
 
 // page 1:          page 2:
 // 0: mix           gain
@@ -122,7 +122,7 @@ private:
 
 struct SculptParameters
 {
-    static std::vector<SculptParameter> sculpt_parameters;
+    static inline std::vector<SculptParameter> sculpt_parameters = std::vector<SculptParameter>();
     
     static void init(bool shift) {
         

@@ -14,7 +14,6 @@ DaisySeed sculpt;
 MidiHandler<MidiUartTransport> midi;
 Led led;
 
-
 Svf filt;
 LFO lfo;
 Freeze<44100> freeze;

@@ -1,3 +1,4 @@
+#pragma once
 
 template<int max_length>
 struct Freeze
