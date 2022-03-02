@@ -120,8 +120,6 @@ private:
     float last_value[2];
 };
 
-
-
 struct SculptParameters
 {
     static std::vector<SculptParameter> sculpt_parameters;
