@@ -37,25 +37,22 @@ enum ParameterPin
     LFO_DEST
 };
 
-using namespace daisy;
-
 constexpr Parameter::Curve Linear = Parameter::Curve::LINEAR;
 constexpr Parameter::Curve LogScale = Parameter::Curve::LOGARITHMIC;
 constexpr Parameter::Curve ExpScale = Parameter::Curve::EXPONENTIAL;
 
-using SingleParameter = std::tuple<ParameterPin, float, float, float, daisy::Parameter::Curve>;
+using SingleParameter = std::tuple<ParameterPin, float, float, float, daisy::Parameter::Curve, std::vector<float>>;
 
 using ParameterInit = std::vector<SingleParameter>;
 
-extern DaisySeed sculpt;
-
 struct SculptParameter
 {
+
     SculptParameter(ParameterInit init){
         
         // Get parameter pin, range, init and scaling
-        auto [pin1, min1, max1, init1, scale1] = init[0];
-        auto [pin2, min2, max2, init2, scale2] = init[1];
+        auto [pin1, min1, max1, init1, scale1, deadzones1] = init[0];
+        auto [pin2, min2, max2, init2, scale2, deadzones2] = init[1];
         
         // Initialise ADC
         control.Init(sculpt.adc.GetPtr((int)pin1 - 15), sculpt.AudioSampleRate() / 256.0f);
@@ -64,6 +61,9 @@ struct SculptParameter
         // Initialise Daisy control scaling
         parameters[0].Init(control, min1, max1, scale1);
         parameters[1].Init(control, min2, max2, scale2);
+        
+        // TODO: test different filter freqs!
+        setFc(50.0f);
         
         // load initial value
         if(shift) {
@@ -76,7 +76,6 @@ struct SculptParameter
         }
     }
     
-
     // Gets parameter value
     float process(bool wanted_shift) {
         
@@ -99,25 +98,53 @@ struct SculptParameter
             last_value[shift] = in_val;
             
             // Return the current adc value with scaling
-            return parameters[shift].Process(in_val);
+            return applyDeadzones(parameters[shift].Process(in_val), wanted_shift);
         }
         // If the unselected shift is wanted, return the last known value
         else {
             // Return last value with scaling
-            return parameters[wanted_shift].Process(last_value[wanted_shift]);
+            return applyDeadzones(parameters[wanted_shift].Process(last_value[wanted_shift]), wanted_shift);
         }
+    }
+    
+    
+    inline void setFc(double Fc) {
+        b1 = exp(-2.0 * M_PI * Fc);
+        a0 = 1.0 - b1;
+    }
+    
+    inline float applyFilter(float in, bool shift) {
+        return z1[shift] = in * a0 + z1[shift] * b1;
+        //return in;
+    }
+    
+    inline float applyDeadzones(float value, bool shift) {
+        
+        for(auto& deadzone : deadzones[shift]) {
+            if(abs(value - deadzone) < deadzone_size) {
+                return applyFilter(deadzone, shift);
+            }
+        }
+        
+        return applyFilter(value, shift);
     }
     
     static inline bool shift = false;
     bool touched = true;
     
-    Parameter parameters[2];
-    
 private:
     
-    AnalogControl control;
-
+    Parameter parameters[2];
+    std::vector<float> deadzones[2];
+    
     float last_value[2];
+    double a0, b1, z1[2];
+    
+    
+    float deadzone_size = 0.05f;
+    
+    
+    AnalogControl control;
 };
 
 struct SculptParameters
@@ -131,18 +158,18 @@ struct SculptParameters
         // Initialise parameters
         // Make sure the adc is initialised before calling this!
         sculpt_parameters = {
-            SculptParameter({{MIX, 0.0f, 1.0f, 0.5f, Linear},            {GAIN, 1.0f, 4.0f, 0.5f, Linear}}),
-            SculptParameter({{LPF_Q, 0.0f, 0.99f, 0.5f, Linear},         {FEEDBACK, 0.0f, 0.99f, 0.0f, Linear}}),
-            SculptParameter({{LPF_HZ, 30.0f, 9000.0f, 0.7f, ExpScale},   {DELAY, 128.0f, 20000.0f, 0.1f, Linear}}),
-            SculptParameter({{SHAPE, 0.0f, 3.0f, 0.75f, Linear},         {STRETCH, 0.0f, 2.0f, 0.5f, Linear}}),
-            SculptParameter({{Q, 0.4f, 30.0f, 0.5f, ExpScale},           {FREEZE_SIZE, 64.0f, 8192.0f, 0.5f, Linear}}),
-            SculptParameter({{SUB, 0.0f, 1.0f, 0.5f, Linear},            {DRIVE, 1.4f, 128.0f, 0.0f, Linear}}),
-            SculptParameter({{ATTACK, 5.0f, 4000.0f, 0.02f, ExpScale},   {LFO_SHAPE, 0.0f, 2.0f, 0.5f, Linear}}),
-            SculptParameter({{DECAY, 5.0f, 4000.0f, 0.4f, ExpScale},     {LFO_RATE, 0.5f, 20.0f, 0.2f, Linear}}),
-            SculptParameter({{SUSTAIN, 0.0f, 1.0f, 0.3f, Linear},        {LFO_DEPTH, -1.0f, 1.0f, 0.5f, Linear}}),
-            SculptParameter({{RELEASE, 5.0f, 4000.0f, 0.2f, ExpScale},   {LFO_DEST, 0.0f, 2.0f, 0.5f, Linear}})};
+            SculptParameter({{MIX, 0.0f, 1.0f, 0.5f, Linear, {}},            {GAIN, 1.0f, 4.0f, 0.5f, Linear, {}}}),
+            SculptParameter({{LPF_Q, 0.0f, 0.99f, 0.5f, Linear, {}},         {FEEDBACK, 0.0f, 0.99f, 0.0f, Linear, {}}}),
+            SculptParameter({{LPF_HZ, 30.0f, 9000.0f, 0.7f, ExpScale, {}},   {DELAY, 128.0f, (sample_rate / 2.0f), 0.1f, Linear, {}}}),
+            SculptParameter({{SHAPE, 0.0f, 3.0f, 0.75f, Linear, {}},         {STRETCH, 0.0f, 2.0f, 0.5f, Linear, {1.0f}}}),
+            SculptParameter({{Q, 0.4f, 30.0f, 0.5f, ExpScale, {}},           {FREEZE_SIZE, 64.0f, 8192.0f, 0.5f, Linear, {}}}),
+            SculptParameter({{SUB, 0.0f, 1.0f, 0.5f, Linear, {}},            {DRIVE, 1.4f, 128.0f, 0.0f, Linear, {}}}),
+            SculptParameter({{ATTACK, 5.0f, 4000.0f, 0.02f, ExpScale, {}},   {LFO_SHAPE, 0.0f, 2.0f, 0.5f, Linear, {}}}),
+            SculptParameter({{DECAY, 5.0f, 4000.0f, 0.4f, ExpScale, {}},     {LFO_RATE, 0.5f, 20.0f, 0.2f, Linear, {}}}),
+            SculptParameter({{SUSTAIN, 0.0f, 1.0f, 0.3f, Linear, {}},        {LFO_DEPTH, -1.0f, 1.0f, 0.5f, Linear, {}}}),
+            SculptParameter({{RELEASE, 5.0f, 4000.0f, 0.2f, ExpScale, {}},   {LFO_DEST, 0.0f, 2.0f, 0.5f, Linear, {}}})};
     }
-   
+    
     static void set_shift(bool shift) {
         
         // Check if changed
@@ -152,10 +179,10 @@ struct SculptParameters
         for(auto& param : sculpt_parameters) {
             param.touched = false;
         }
-        
+
         SculptParameter::shift = shift;
     }
-
+    
     static float get_value(ParameterPin pin) {
         
         if(pin >= 25)  {
@@ -165,6 +192,6 @@ struct SculptParameters
             return sculpt_parameters[(int)pin - 15].process(false);
         }
     }
-
+    
 };
 

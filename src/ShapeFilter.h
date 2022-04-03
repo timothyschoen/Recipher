@@ -3,6 +3,7 @@
 #include <tuple>
 #include <algorithm>
 
+
 enum Shape
 {
     Sine,
@@ -37,10 +38,6 @@ struct ShapeFilter
         update_filter();
     }
     
-    void init(float sr) {
-        sample_rate = sr;
-    }
-    
     void clear_filters() {
         
         for(int i = 0; i < num_harmonics; i++) {
@@ -57,8 +54,8 @@ struct ShapeFilter
         }
     }
     
-    void set_frequency(float frequency) {
-        freq = frequency;
+    void set_pitch(float midi_note) {
+        note = midi_note;
     }
     
     void set_shape(float shp) {
@@ -76,6 +73,12 @@ struct ShapeFilter
     void set_q(float new_q) {
         q = std::clamp(new_q, 0.1f, 30.0f);
     }
+    
+    void set_bend(float bend_amt) {
+        pitch_bend = bend_amt;
+        
+    }
+    
     
     template <typename FloatType>
     static FloatType fast_tan (FloatType x) noexcept
@@ -96,9 +99,9 @@ struct ShapeFilter
             float total_stretch = std::clamp(stretch + stretch_mod, 0.1f, 2.0f);
             float stretch_factor = i * total_stretch;
             
-            float frequency = freq * (stretch_factor + 1.0f);
+            float frequency = mtof(note + pitch_bend) * (stretch_factor + 1.0f);
             
-            if(frequency > 20000) break;
+            if(frequency > (sample_rate / 2.0f)) break;
             
             g[i] = fast_tan(M_PI * frequency / sample_rate);
             h[i] = 1.0f / (1.0f + R2 * g[i] + g[i] * g[i]);
@@ -155,17 +158,17 @@ struct ShapeFilter
 private:
     
     static constexpr int num_harmonics = 5;
-    static constexpr int cascade = 3;
+    static constexpr int cascade = 2;
     
     float shape_harmonics[(int)Shape::NumShapes][num_harmonics];
     
-    float freq = 100.0f;
+    float note = 60.f;
     float q = 2.0f;
     float shape = 0.5f;
     float stretch = 1.0f;
     float stretch_mod = 0.0f;
     
-    float sample_rate = 44100.0f;
+    float pitch_bend = 0.0f;
     
     FilterState svf[cascade][num_harmonics];
     

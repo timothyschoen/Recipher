@@ -1,23 +1,29 @@
 #include "daisysp.h"
 #include "daisy_seed.h"
 
+// Expose samplerate and sculpt interface to headers
+using namespace daisysp;
+using namespace daisy;
+
+constexpr float sample_rate = 32000.0f;
+constexpr int max_delay_samples = 32000;
+DaisySeed sculpt;
+
 #include "ShapeFilter.h"
 #include "Freeze.h"
 #include "Parameters.h"
 #include "LFO.h"
 
-using namespace daisysp;
-using namespace daisy;
-
-DaisySeed sculpt;
-
 MidiHandler<MidiUartTransport> midi;
 Led led;
 
+
 Svf filt;
 LFO lfo;
-Freeze<44100> freeze;
-DelayLine<float, 44100> delay;
+
+// One second maximum for freeze length and delay time
+Freeze<max_delay_samples> freeze;
+DelayLine<float, max_delay_samples> delay;
 
 class Voice
 {
@@ -35,7 +41,6 @@ class Voice
         env.SetTime(ADSR_SEG_RELEASE, 0.2f);
         sub_1.Init(samplerate);
         sub_2.Init(samplerate);
-        filter.init(samplerate);
         filter.set_q(6.0f);
     }
 
@@ -68,13 +73,18 @@ class Voice
         note     = midi_note;
         velocity = vel;
         
-        sub_1.SetFreq(mtof(note - 12));
-        sub_2.SetFreq(mtof(note - 24));
+        sub_1.SetFreq(mtof(note - 12 + bend));
+        sub_2.SetFreq(mtof(note - 24 + bend));
         
-        filter.set_frequency(mtof(note));
+        filter.set_pitch(note);
         
         active  = true;
         envgate = true;
+    }
+    
+    void set_bend(float bend_amt) {
+        filter.set_bend(bend_amt);
+        bend = bend_amt;
     }
     
 
@@ -87,6 +97,7 @@ class Voice
     ShapeFilter filter;
     Adsr       env;
     
+    float bend = 0.0f;
     float sub_level = 0.2;
     
   private:
@@ -153,7 +164,6 @@ class VoiceManager
             voices[i].note_off();
         }
     }
-
     
     void set_stretch(float all_val) {
         for(auto& voice : voices) voice.filter.set_stretch(all_val);
@@ -190,6 +200,10 @@ class VoiceManager
     
     void set_sub(float all_val) {
         for(auto& voice : voices) voice.sub_level = all_val;
+    }
+    
+    void set_bend(float pitch_bend) {
+        for(auto& voice : voices) voice.set_bend(pitch_bend);
     }
     
     void update_filters() {
@@ -232,7 +246,7 @@ class VoiceManager
     }
 };
 
-static VoiceManager<6> voice_handler;
+static VoiceManager<8> voice_handler;
 
 static float trig = 0;
 
@@ -242,9 +256,7 @@ static auto distribution = std::uniform_real_distribution<float>(-0.999, +0.999)
 constexpr int num_potmeters = 10;
 constexpr int num_switches = 2;
 
-AnalogControl switches[num_switches];
-
-
+Switch switches[num_switches];
 
 float smooth_time;
 float smooth_cutoff;
@@ -253,9 +265,9 @@ float lpf_mod = 0.0f;
 float delay_mod = 0.0f;
 float stretch_mod = 0.0f;
 
-
 float lfo_depth = 1.0f;
 float lfo_destination = 1.0f;
+
 
 void apply_lfo() {
     
@@ -298,13 +310,14 @@ float delay_samples = 1.0f;
 float lpf_cutoff = 18000.0f;
 
 void update_parameters() {
-    
-    bool shift = switches[0].Process() > 0.1;
+    switches[0].Debounce();
+    switches[1].Debounce();
+
+    bool shift = switches[0].Pressed();
     
     SculptParameters::set_shift(shift);
     
-
-        freeze.set_freeze(switches[1].Process() > 0.1);
+        freeze.set_freeze(switches[1].Pressed());
         
         noise_mix = SculptParameters::get_value(MIX);
         
@@ -353,10 +366,30 @@ void HandleMidiMessage(MidiEvent m)
             }
         }
         break;
+        
         case NoteOff:
         {
             NoteOnEvent p = m.AsNoteOn();
             voice_handler.note_off(p.note, p.velocity);
+        }
+        break;
+        case ControlChange:
+        {
+            ControlChangeEvent p = m.AsControlChange();
+            if(p.control_number == 4) { // sustain pedal
+                
+            }
+            if(p.control_number > 4 && p.control_number < 16) {
+                // control change
+            }
+        }
+        case PitchBend:
+        {
+            PitchBendEvent p = m.AsPitchBend();
+            float scale = (p.value / 16384.f) - 0.5f; // TODO: not correct yet!
+            float range = 12.0f;
+            voice_handler.set_bend(scale * range);
+            
         }
         break;
         default: break;
@@ -397,7 +430,7 @@ void audio_callback(const float* const* in, float** out, size_t size)
         apply_lfo();
         
         fonepole(smooth_time, delay_samples + delay_mod, 0.0005f);
-        synth_out += delay.ReadHermite(std::clamp(smooth_time, 1.0f, 20000.0f));
+        synth_out += delay.ReadHermite(std::clamp(smooth_time, 1.0f, static_cast<float>(max_delay_samples)));
         
         delay.Write(synth_out * feedback);
         
@@ -405,7 +438,7 @@ void audio_callback(const float* const* in, float** out, size_t size)
         synth_out = (fast_tanh(synth_out * drive) * (1.0f / sqrt(drive)));
         
         fonepole(smooth_cutoff, lpf_cutoff + lpf_mod, 0.0005f);
-        filt.SetFreq(std::clamp(smooth_cutoff, 20.0f, 20000.0f));
+        filt.SetFreq(std::clamp(smooth_cutoff, 20.0f, static_cast<float>(max_delay_samples)));
         
         filt.Process(synth_out);
         synth_out = filt.Low();
@@ -416,43 +449,57 @@ void audio_callback(const float* const* in, float** out, size_t size)
     }
 }
 
+uint8_t buffer[128];
+bool MsgRcvd = false;
+uint8_t MsgSize = 0;
+
+void UsbCallback(uint8_t* buf, uint32_t* len)
+ {
+   if(!buf || !len)
+     return;
+   uint8_t tmpSize;
+   if(*len < 128U)
+     tmpSize = *len;
+   else
+     tmpSize = 128U;
+   for(size_t i = 0; i < tmpSize; i++)
+   {
+     buffer[i] = buf[i];
+   }
+   MsgRcvd = true;
+   MsgSize = *len;
+ }
 
 int main(void)
 {
     sculpt.Configure();
     sculpt.Init();
     
-    
     sculpt.SetAudioBlockSize(256);
     
-    float sample_rate = sculpt.AudioSampleRate();
+    sculpt.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_32KHZ);
     
     led.Init(DaisySeed::GetPin (4), false, sample_rate);
 
+    switches[0].Init(DaisySeed::GetPin(25), 0, Switch::TYPE_TOGGLE, Switch::POLARITY_NORMAL, Switch::PULL_DOWN);
+    switches[1].Init(DaisySeed::GetPin(28), 0, Switch::TYPE_TOGGLE, Switch::POLARITY_NORMAL, Switch::PULL_DOWN);
+    
+    //sculpt.usb_handle.Init(UsbHandle::FS_INTERNAL);
+    //dsy_system_delay(250);
+    //sculpt.usb_handle.SetReceiveCallback(UsbCallback, UsbHandle::FS_INTERNAL);
     
     // Initialise potmeters
-    AdcChannelConfig adcConfig[num_potmeters + num_switches];
+    AdcChannelConfig adcConfig[num_potmeters];
     
     for (int i = 0; i < num_potmeters; i++)
     {
         adcConfig[i].InitSingle (daisy::DaisySeed::GetPin (15 + i));
     }
     
-    // Initialise shift and freeze knob
-    adcConfig[num_potmeters].InitSingle (daisy::DaisySeed::GetPin(25));
-    adcConfig[num_potmeters + 1].InitSingle (daisy::DaisySeed::GetPin(28));
-    
-    sculpt.adc.Init (adcConfig, num_potmeters + num_switches);
-    
-    switches[0].Init(sculpt.adc.GetPtr(num_potmeters), sample_rate  / 256.0f);
-    switches[1].Init(sculpt.adc.GetPtr(num_potmeters + 1), sample_rate / 256.0f);
-
-    switches[0].SetCoeff(0.01f);
-    switches[1].SetCoeff(0.01f);
-    
-    SculptParameters::init(switches[0].Process() > 0.1);
+    sculpt.adc.Init (adcConfig, num_potmeters);
     sculpt.adc.Start();
-    
+        
+    SculptParameters::init(switches[0].RawState());
     
     auto config = daisy::MidiHandler<MidiUartTransport>::Config();
     midi.Init(config);
@@ -473,7 +520,7 @@ int main(void)
 
 
     while(true) {
-        System::Delay(std::numeric_limits<int>::max());
+        System::Delay(250);
     }
     
 }

@@ -3,7 +3,6 @@
 
 #pragma once
 
-
 class LFO {
 
 public:
@@ -33,16 +32,10 @@ public:
         frequency = freq;
     }
 
-    void set_sample_rate(float sr)
-    {
-        sample_rate = sr;
-    }
-
 private:
     float shape = 0;
 
     float frequency = 1.0f;
-    float sample_rate = 44100.0f;
     float phase = 0.0f;
     float twoPI = 2.0f * M_PI;
 
