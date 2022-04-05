@@ -157,8 +157,8 @@ struct ShapeFilter
 
 private:
     
-    static constexpr int num_harmonics = 5;
-    static constexpr int cascade = 2;
+    static constexpr int num_harmonics = 7;
+    static constexpr int cascade = 3;
     
     float shape_harmonics[(int)Shape::NumShapes][num_harmonics];
     

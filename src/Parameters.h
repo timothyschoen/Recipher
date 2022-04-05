@@ -58,21 +58,23 @@ struct SculptParameter
         control.Init(sculpt.adc.GetPtr((int)pin1 - 15), sculpt.AudioSampleRate() / 256.0f);
         control.SetCoeff (0.5f);
         
+        deadzones[0] = deadzones1;
+        deadzones[1] = deadzones2;
+        
         // Initialise Daisy control scaling
         parameters[0].Init(control, min1, max1, scale1);
         parameters[1].Init(control, min2, max2, scale2);
         
-        // TODO: test different filter freqs!
-        setFc(50.0f);
+        setFc(0.5f);
         
         // load initial value
         if(shift) {
-            last_value[1] = init1;
-            last_value[0] = control.Process();
+            last_value[1] = control.Process();
+            last_value[0] = init1;
         }
         else {
-            last_value[1] = control.Process();
-            last_value[0] = init2;
+            last_value[1] = init2;
+            last_value[0] = control.Process();
         }
     }
     
@@ -91,19 +93,19 @@ struct SculptParameter
             // If the value hasn't been touched since the last shift change, return the last known value
             if(!touched) {
                 // Return last value with scaling
-                return parameters[shift].Process(last_value[shift]);
+                return parameters[shift].Process(applyDeadzones(last_value[shift], shift));
             }
                         
             // If it has been touched, set last value to the current value
             last_value[shift] = in_val;
             
             // Return the current adc value with scaling
-            return applyDeadzones(parameters[shift].Process(in_val), wanted_shift);
+            return parameters[shift].Process(applyDeadzones(in_val, wanted_shift));
         }
         // If the unselected shift is wanted, return the last known value
         else {
             // Return last value with scaling
-            return applyDeadzones(parameters[wanted_shift].Process(last_value[wanted_shift]), wanted_shift);
+            return parameters[wanted_shift].Process(applyDeadzones(last_value[wanted_shift], wanted_shift));
         }
     }
     
@@ -126,7 +128,10 @@ struct SculptParameter
             }
         }
         
-        return applyFilter(value, shift);
+        // just to keep filter state up-to-date
+        applyFilter(value, shift);
+        
+        return value;
     }
     
     static inline bool shift = false;
@@ -141,7 +146,7 @@ private:
     double a0, b1, z1[2];
     
     
-    float deadzone_size = 0.05f;
+    float deadzone_size = 0.015f;
     
     
     AnalogControl control;
@@ -161,7 +166,7 @@ struct SculptParameters
             SculptParameter({{MIX, 0.0f, 1.0f, 0.5f, Linear, {}},            {GAIN, 1.0f, 4.0f, 0.5f, Linear, {}}}),
             SculptParameter({{LPF_Q, 0.0f, 0.99f, 0.5f, Linear, {}},         {FEEDBACK, 0.0f, 0.99f, 0.0f, Linear, {}}}),
             SculptParameter({{LPF_HZ, 30.0f, 9000.0f, 0.7f, ExpScale, {}},   {DELAY, 128.0f, (sample_rate / 2.0f), 0.1f, Linear, {}}}),
-            SculptParameter({{SHAPE, 0.0f, 3.0f, 0.75f, Linear, {}},         {STRETCH, 0.0f, 2.0f, 0.5f, Linear, {1.0f}}}),
+            SculptParameter({{SHAPE, 0.0f, 3.0f, 0.75f, Linear, {}},         {STRETCH, 0.0f, 2.0f, 0.5f, Linear, {0.5f}}}),
             SculptParameter({{Q, 0.4f, 30.0f, 0.5f, ExpScale, {}},           {FREEZE_SIZE, 64.0f, 8192.0f, 0.5f, Linear, {}}}),
             SculptParameter({{SUB, 0.0f, 1.0f, 0.5f, Linear, {}},            {DRIVE, 1.4f, 128.0f, 0.0f, Linear, {}}}),
             SculptParameter({{ATTACK, 5.0f, 4000.0f, 0.02f, ExpScale, {}},   {LFO_SHAPE, 0.0f, 2.0f, 0.5f, Linear, {}}}),

@@ -386,9 +386,11 @@ void HandleMidiMessage(MidiEvent m)
         case PitchBend:
         {
             PitchBendEvent p = m.AsPitchBend();
-            float scale = (p.value / 16384.f) - 0.5f; // TODO: not correct yet!
-            float range = 12.0f;
-            voice_handler.set_bend(scale * range);
+
+            float range = 12.0f; // range in semitones
+            float bend = p.value * (1.0f / 8192.0f) * range;
+            
+            voice_handler.set_bend(bend);
             
         }
         break;
@@ -499,7 +501,9 @@ int main(void)
     sculpt.adc.Init (adcConfig, num_potmeters);
     sculpt.adc.Start();
         
-    SculptParameters::init(switches[0].RawState());
+    switches[0].Debounce();
+    
+    SculptParameters::init(switches[0].Pressed());
     
     auto config = daisy::MidiHandler<MidiUartTransport>::Config();
     midi.Init(config);

@@ -9,8 +9,13 @@ public:
 
     // Move phase value to the next sample
     float tick() {
-        phase += frequency / sample_rate;
-        if(phase >= 1) phase = phase - 1;
+        
+        if(frequency != 0)
+        {
+            phase += frequency / sample_rate;
+            if(phase >= 1) phase = phase - 1;
+        }
+        
         
         // Mix between shapes
         int first_shape = shape;
