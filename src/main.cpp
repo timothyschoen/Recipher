@@ -353,7 +353,7 @@ float stretch_mod = 0.0f;
 float lfo_depth = 1.0f;
 float lfo_destination = 1.0f;
 
-ParameterPin mod_targets[3] = {ParameterPin::LPF_HZ, ParameterPin::DELAY, ParameterPin::FREEZE_SIZE};
+ParameterPin mod_targets[3] = {ParameterPin::LPF_NOTE, ParameterPin::DELAY, ParameterPin::FREEZE_SIZE};
 
 void apply_lfo() {
     
@@ -398,19 +398,16 @@ float sub_octave = 0.0f;
 
 void update_parameters() {
     
-    switches[0].Debounce();
-    switches[1].Debounce();
-    
-    bool shift = switches[0].Pressed();
+    bool shift = switches[0].RawState();
     
     SculptParameters::set_shift(shift);
     
-    freeze.set_freeze(switches[1].Pressed());
+    freeze.set_freeze(switches[1].RawState());
     
     noise_mix = SculptParameters::get_value(MIX);
     
     filt.SetRes(SculptParameters::get_value(LPF_Q));
-    lpf_cutoff = SculptParameters::get_value(LPF_HZ);
+    lpf_cutoff = mtof(SculptParameters::get_value(LPF_NOTE));
     
     voice_handler.set_q(SculptParameters::get_value(Q));
     voice_handler.set_shape(SculptParameters::get_value(SHAPE));
@@ -506,7 +503,7 @@ void audio_callback(const float* const* in, float** out, size_t size)
     }
 
     
-    //led.Update();
+    led.Update();
 #endif
     
     apply_lfo();
@@ -544,8 +541,6 @@ void audio_callback(const float* const* in, float** out, size_t size)
         out[0][i] = synth_out * 2.0f;
         trig = 0.0;
     }
-    
-    led.Update();
 }
 
 #if JUCE
@@ -575,6 +570,7 @@ void set_parameter(int idx, float value, bool shift) {
     switches[0].state = shift;
 }
 #else
+
 int main(void)
 {
     sculpt.Configure();
@@ -600,9 +596,7 @@ int main(void)
     sculpt.adc.Init (adcConfig, num_potmeters);
     sculpt.adc.Start();
     
-    switches[0].Debounce();
-    
-    SculptParameters::init(switches[0].Pressed());
+    SculptParameters::init(switches[0].RawState());
     
     auto uart_config = MidiUartHandler::Config();
     uart_midi.Init(uart_config);

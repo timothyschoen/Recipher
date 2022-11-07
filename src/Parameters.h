@@ -17,7 +17,7 @@ enum ParameterPin
 {
     MIX = 15,
     LPF_Q,
-    LPF_HZ,
+    LPF_NOTE,
     SHAPE,
     Q,
     OCTAVER,
@@ -52,7 +52,7 @@ using SingleParameter = std::tuple<ParameterPin, float, float, float, daisy::Par
 
 using ParameterInit = std::vector<SingleParameter>;
 
-static inline ParameterMode parameter_mode = TOUCH;
+static inline ParameterMode parameter_mode = PICKUP;
 
 struct SculptParameter
 {
@@ -68,14 +68,16 @@ struct SculptParameter
         control.Init(sculpt.adc.GetPtr((int)pin1 - 15), sculpt.AudioSampleRate() / 256.0f);
         control.SetCoeff (0.5f);
         
+        
+        float control_value = control.GetRawFloat();
         // load initial value
         if(shift) {
-            last_value[1] = control.Process();
+            last_value[1] = control_value;
             last_value[0] = init1;
         }
         else {
             last_value[1] = init2;
-            last_value[0] = control.Process();
+            last_value[0] = control_value;
         }
 #else
         last_value[1] = init1;
@@ -93,7 +95,7 @@ struct SculptParameter
         
         set_fc(0.5f);
         
-        touched_value = control.Process();
+        touched_value = control_value;
     }
     
     float process_pickup(float knob_position) {
@@ -230,15 +232,14 @@ struct SculptParameters
         sculpt_parameters = {
             SculptParameter({{MIX, 0.0f, 1.0f, 0.5f, Linear, {}},            {GAIN, 1.0f, 4.0f, 0.5f, Linear, {}}}),
             SculptParameter({{LPF_Q, 0.0f, 0.99f, 0.5f, Linear, {}},         {FEEDBACK, 0.0f, 0.99f, 0.0f, Linear, {}}}),
-            SculptParameter({{LPF_HZ, 30.0f, 14000.0f, 0.7f, LogScale, {}},  {DELAY, 128.0f, (sample_rate / 2.0f), 0.1f, Linear, {}}}),
+            SculptParameter({{LPF_NOTE, 23.0f, 132.0f, 0.7f, Linear, {}},    {DELAY, 128.0f, (sample_rate / 2.0f), 0.1f, Linear, {}}}),
             SculptParameter({{SHAPE, 0.0f, 3.0f, 0.75f, Linear, {}},         {STRETCH, 0.0f, 2.0f, 0.5f, Linear, {0.5f}}}),
             SculptParameter({{Q, 1.0f, 30.0f, 0.5f, ExpScale, {}},           {DRIVE, 0.1f, 1.0f, 0.5f, Linear, {}}}),
-            SculptParameter({{OCTAVER, -1.0f, 1.0f, 0.5f, Linear, {}},       {FREEZE_SIZE, 64.0f, 8192.0f, 0.0f, ExpScale, {}}}),
+            SculptParameter({{OCTAVER, -1.0f, 1.0f, 0.5f, Linear, {0.5f}},   {FREEZE_SIZE, 64.0f, 8192.0f, 0.0f, ExpScale, {}}}),
             SculptParameter({{ATTACK, 5.0f, 4000.0f, 0.02f, ExpScale, {}},   {LFO_SHAPE, 0.0f, 2.0f, 0.5f, Linear, {}}}),
             SculptParameter({{DECAY, 5.0f, 4000.0f, 0.4f, ExpScale, {}},     {LFO_RATE, 0.5f, 20.0f, 0.2f, Linear, {}}}),
             SculptParameter({{SUSTAIN, 0.0f, 1.0f, 0.3f, Linear, {}},        {LFO_DEPTH, -1.0f, 1.0f, 0.5f, Linear, {0.5f}}}),
             SculptParameter({{RELEASE, 5.0f, 4000.0f, 0.2f, ExpScale, {}},   {LFO_DEST, 0.0f, 2.0f, 0.5f, Linear, {}}})
-            
         };
         
     }
@@ -256,8 +257,6 @@ struct SculptParameters
                 param.set_touch_value();
             }
         }
-        
-
 
         SculptParameter::shift = shift;
     }
