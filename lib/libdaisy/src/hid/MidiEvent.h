@@ -130,9 +130,20 @@ struct PitchBendEvent
     int     channel; /**< & */
     int16_t value;   /**< & */
 };
+/** Struct containing channel mode event for a given channel.
+Can be made from MidiEvent
+*/
+struct ChannelModeEvent
+{
+    int             channel;    /**< & */
+    ChannelModeType event_type; /**< & */
+    int16_t         value;      /**< & */
+};
 /** Struct containing sysex data.
 Can be made from MidiEvent
 */
+
+#define SYSEX_BUFFER_LEN 128
 struct SystemExclusiveEvent
 {
     int     length;
@@ -302,6 +313,18 @@ struct MidiEvent
         m.value   = ((uint16_t)data[1] << 7) + (data[0] - 8192);
         return m;
     }
+
+    ChannelModeEvent AsChannelMode()
+    {
+        ChannelModeEvent m;
+
+        m.channel    = channel;
+        m.event_type = (ChannelModeType)(data[0] - 120);
+        m.value      = data[1];
+
+        return m;
+    }
+
     SystemExclusiveEvent AsSystemExclusive()
     {
         SystemExclusiveEvent m;

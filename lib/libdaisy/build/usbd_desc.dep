@@ -1,47 +1,37 @@
 build/src/usbd/usbd_desc.o: src/usbd/usbd_desc.c \
  Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h \
- src/usbd/usbd_conf.h /Applications/ARM/arm-none-eabi/include/stdio.h \
- /Applications/ARM/arm-none-eabi/include/_ansi.h \
- /Applications/ARM/arm-none-eabi/include/newlib.h \
- /Applications/ARM/arm-none-eabi/include/_newlib_version.h \
- /Applications/ARM/arm-none-eabi/include/sys/config.h \
- /Applications/ARM/arm-none-eabi/include/machine/ieeefp.h \
- /Applications/ARM/arm-none-eabi/include/sys/features.h \
- /Applications/ARM/arm-none-eabi/include/sys/cdefs.h \
- /Applications/ARM/arm-none-eabi/include/machine/_default_types.h \
- /Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h \
- /Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stdarg.h \
- /Applications/ARM/arm-none-eabi/include/sys/reent.h \
- /Applications/ARM/arm-none-eabi/include/_ansi.h \
- /Applications/ARM/arm-none-eabi/include/sys/_types.h \
- /Applications/ARM/arm-none-eabi/include/machine/_types.h \
- /Applications/ARM/arm-none-eabi/include/sys/lock.h \
- /Applications/ARM/arm-none-eabi/include/sys/types.h \
- /Applications/ARM/arm-none-eabi/include/sys/_stdint.h \
- /Applications/ARM/arm-none-eabi/include/machine/endian.h \
- /Applications/ARM/arm-none-eabi/include/machine/_endian.h \
- /Applications/ARM/arm-none-eabi/include/sys/select.h \
- /Applications/ARM/arm-none-eabi/include/sys/_sigset.h \
- /Applications/ARM/arm-none-eabi/include/sys/_timeval.h \
- /Applications/ARM/arm-none-eabi/include/sys/timespec.h \
- /Applications/ARM/arm-none-eabi/include/sys/_timespec.h \
- /Applications/ARM/arm-none-eabi/include/sys/_pthreadtypes.h \
- /Applications/ARM/arm-none-eabi/include/sys/sched.h \
- /Applications/ARM/arm-none-eabi/include/machine/types.h \
- /Applications/ARM/arm-none-eabi/include/sys/stdio.h \
- /Applications/ARM/arm-none-eabi/include/stdlib.h \
- /Applications/ARM/arm-none-eabi/include/machine/stdlib.h \
- /Applications/ARM/arm-none-eabi/include/alloca.h \
- /Applications/ARM/arm-none-eabi/include/string.h \
- /Applications/ARM/arm-none-eabi/include/sys/_locale.h \
- /Applications/ARM/arm-none-eabi/include/strings.h \
- /Applications/ARM/arm-none-eabi/include/sys/string.h \
+ src/usbd/usbd_conf.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/stdio.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/_ansi.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/newlib.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/_newlib_version.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/config.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/machine/ieeefp.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/features.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/cdefs.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/machine/_default_types.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/lib/gcc/arm-none-eabi/11.3.1/include/stddef.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/lib/gcc/arm-none-eabi/11.3.1/include/stdarg.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/reent.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/_ansi.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/_types.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/machine/_types.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/lock.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/stdio.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/stdlib.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/machine/stdlib.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/alloca.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/string.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/_locale.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/strings.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/string.h \
  Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h \
  Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h \
  Drivers/CMSIS/Include/core_cm7.h \
- /Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h \
- /Applications/ARM/arm-none-eabi/include/stdint.h \
- /Applications/ARM/arm-none-eabi/include/sys/_intsup.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/lib/gcc/arm-none-eabi/11.3.1/include/stdint.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/stdint.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/_intsup.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h \
  Drivers/CMSIS/Include/cmsis_compiler.h Drivers/CMSIS/Include/cmsis_gcc.h \
  Drivers/CMSIS/Device/ST/STM32H7xx/Include/system_stm32h7xx.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h \
@@ -49,7 +39,7 @@ build/src/usbd/usbd_desc.o: src/usbd/usbd_desc.c \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
- /Applications/ARM/arm-none-eabi/include/math.h \
+ /Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/math.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio_ex.h \
@@ -142,48 +132,37 @@ build/src/usbd/usbd_desc.o: src/usbd/usbd_desc.c \
  src/usbd/usbd_conf.h
 Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h:
 src/usbd/usbd_conf.h:
-/Applications/ARM/arm-none-eabi/include/stdio.h:
-/Applications/ARM/arm-none-eabi/include/_ansi.h:
-/Applications/ARM/arm-none-eabi/include/newlib.h:
-/Applications/ARM/arm-none-eabi/include/_newlib_version.h:
-/Applications/ARM/arm-none-eabi/include/sys/config.h:
-/Applications/ARM/arm-none-eabi/include/machine/ieeefp.h:
-/Applications/ARM/arm-none-eabi/include/sys/features.h:
-/Applications/ARM/arm-none-eabi/include/sys/cdefs.h:
-/Applications/ARM/arm-none-eabi/include/machine/_default_types.h:
-/Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h:
-/Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stdarg.h:
-/Applications/ARM/arm-none-eabi/include/sys/reent.h:
-/Applications/ARM/arm-none-eabi/include/_ansi.h:
-/Applications/ARM/arm-none-eabi/include/sys/_types.h:
-/Applications/ARM/arm-none-eabi/include/machine/_types.h:
-/Applications/ARM/arm-none-eabi/include/sys/lock.h:
-/Applications/ARM/arm-none-eabi/include/sys/types.h:
-/Applications/ARM/arm-none-eabi/include/sys/_stdint.h:
-/Applications/ARM/arm-none-eabi/include/machine/endian.h:
-/Applications/ARM/arm-none-eabi/include/machine/_endian.h:
-/Applications/ARM/arm-none-eabi/include/sys/select.h:
-/Applications/ARM/arm-none-eabi/include/sys/_sigset.h:
-/Applications/ARM/arm-none-eabi/include/sys/_timeval.h:
-/Applications/ARM/arm-none-eabi/include/sys/timespec.h:
-/Applications/ARM/arm-none-eabi/include/sys/_timespec.h:
-/Applications/ARM/arm-none-eabi/include/sys/_pthreadtypes.h:
-/Applications/ARM/arm-none-eabi/include/sys/sched.h:
-/Applications/ARM/arm-none-eabi/include/machine/types.h:
-/Applications/ARM/arm-none-eabi/include/sys/stdio.h:
-/Applications/ARM/arm-none-eabi/include/stdlib.h:
-/Applications/ARM/arm-none-eabi/include/machine/stdlib.h:
-/Applications/ARM/arm-none-eabi/include/alloca.h:
-/Applications/ARM/arm-none-eabi/include/string.h:
-/Applications/ARM/arm-none-eabi/include/sys/_locale.h:
-/Applications/ARM/arm-none-eabi/include/strings.h:
-/Applications/ARM/arm-none-eabi/include/sys/string.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/stdio.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/_ansi.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/newlib.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/_newlib_version.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/config.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/machine/ieeefp.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/features.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/cdefs.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/machine/_default_types.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/lib/gcc/arm-none-eabi/11.3.1/include/stddef.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/lib/gcc/arm-none-eabi/11.3.1/include/stdarg.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/reent.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/_ansi.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/_types.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/machine/_types.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/lock.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/stdio.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/stdlib.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/machine/stdlib.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/alloca.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/string.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/_locale.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/strings.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/string.h:
 Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h:
 Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h:
 Drivers/CMSIS/Include/core_cm7.h:
-/Applications/ARM/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h:
-/Applications/ARM/arm-none-eabi/include/stdint.h:
-/Applications/ARM/arm-none-eabi/include/sys/_intsup.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/lib/gcc/arm-none-eabi/11.3.1/include/stdint.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/stdint.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/_intsup.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h:
 Drivers/CMSIS/Include/cmsis_compiler.h:
 Drivers/CMSIS/Include/cmsis_gcc.h:
 Drivers/CMSIS/Device/ST/STM32H7xx/Include/system_stm32h7xx.h:
@@ -192,7 +171,7 @@ src/sys/stm32h7xx_hal_conf.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:
-/Applications/ARM/arm-none-eabi/include/math.h:
+/Applications/ArmGNUToolchain/11.3.rel1/arm-none-eabi/arm-none-eabi/include/math.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc_ex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio_ex.h:

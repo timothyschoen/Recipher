@@ -13,6 +13,16 @@ enum Shape
     NumShapes
 };
 
+template <typename Type>
+Type map(Type sourceValue, Type sourceRangeMin, Type sourceRangeMax, Type targetRangeMin, Type targetRangeMax) {
+    return targetRangeMin + ((targetRangeMax - targetRangeMin) * (sourceValue - sourceRangeMin)) / (sourceRangeMax - sourceRangeMin);
+}
+
+template <typename Type>
+constexpr Type map(Type value0To1, Type targetRangeMin, Type targetRangeMax) {
+    return targetRangeMin + value0To1 * (targetRangeMax - targetRangeMin);
+}
+
 using FilterState = std::pair<float, float>;
 
 struct ShapeFilter
@@ -119,7 +129,7 @@ struct ShapeFilter
         
         for(int hr = 0; hr < num_harmonics; hr++) {
             // Calculate volume of current harmonic
-            float current_harmonic =  map(distance, shape_harmonics[low_shape][hr], shape_harmonics[high_shape][hr]);
+            float current_harmonic = map(distance, shape_harmonics[low_shape][hr], shape_harmonics[high_shape][hr]);
             
             if(current_harmonic) {
                 // Apply cascaded filters
@@ -127,6 +137,13 @@ struct ShapeFilter
                 
                 for(int c = 0; c < cascade; c++) {
                     filtered = apply_filter(filtered, c, hr);
+                    
+                    if(!std::isfinite(filtered)) {
+#if JUCE
+                        assert(false);
+#endif
+                        filtered = input;
+                    }
                 }
                 
                 output += filtered * current_harmonic;
@@ -177,11 +194,4 @@ private:
     float h[num_harmonics];
     float R2;
     float gain;
-    
-    template <typename Type>
-    constexpr Type map (Type value0To1, Type targetRangeMin, Type targetRangeMax)
-    {
-        return targetRangeMin + value0To1 * (targetRangeMax - targetRangeMin);
-    }
-    
 };

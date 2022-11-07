@@ -3,52 +3,29 @@
 
 using namespace daisy;
 
-void Parameter::Init(AnalogControl input, float min, float max, Curve curve)
+void Parameter::Init(float min, float max, Curve curve)
 {
     pmin_   = min;
     pmax_   = max;
     pcurve_ = curve;
-    in_     = input;
     lmin_   = logf(min < 0.0000001f ? 0.0000001f : min);
     lmax_   = logf(max);
 }
 
-float Parameter::Process()
+float Parameter::Process(float input)
 {
     switch(pcurve_)
     {
-        case LINEAR: val_ = (in_.Process() * (pmax_ - pmin_)) + pmin_; break;
+        case LINEAR: val_ = (input * (pmax_ - pmin_)) + pmin_; break;
         case EXPONENTIAL:
-            val_ = in_.Process();
+            val_ = input;
             val_ = ((val_ * val_) * (pmax_ - pmin_)) + pmin_;
             break;
         case LOGARITHMIC:
-            val_ = expf((in_.Process() * (lmax_ - lmin_)) + lmin_);
+            val_ = expf((input * (lmax_ - lmin_)) + lmin_);
             break;
         case CUBE:
-            val_ = in_.Process();
-            val_ = ((val_ * (val_ * val_)) * (pmax_ - pmin_)) + pmin_;
-            break;
-        default: break;
-    }
-    return val_;
-}
-
-
-float Parameter::Process(float value)
-{
-    switch(pcurve_)
-    {
-        case LINEAR: val_ = (value * (pmax_ - pmin_)) + pmin_; break;
-        case EXPONENTIAL:
-            val_ = value;
-            val_ = ((val_ * val_) * (pmax_ - pmin_)) + pmin_;
-            break;
-        case LOGARITHMIC:
-            val_ = expf((value * (lmax_ - lmin_)) + lmin_);
-            break;
-        case CUBE:
-            val_ = value;
+            val_ = input;
             val_ = ((val_ * (val_ * val_)) * (pmax_ - pmin_)) + pmin_;
             break;
         default: break;

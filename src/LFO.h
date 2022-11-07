@@ -6,16 +6,19 @@
 class LFO {
 
 public:
+    
+    LFO(float sr, int block_size) {
+        rate = sr / block_size;
+    }
 
     // Move phase value to the next sample
     float tick() {
         
         if(frequency != 0)
         {
-            phase += frequency / sample_rate;
+            phase += frequency / rate;
             if(phase >= 1) phase = phase - 1;
         }
-        
         
         // Mix between shapes
         int first_shape = shape;
@@ -25,7 +28,7 @@ public:
         float first_value = (this->*shapePointers[first_shape])();
         float second_value = (this->*shapePointers[second_shape])();
         
-        return (first_value + mix * (second_value - first_value)) * 0.5f;
+        return (first_value + mix * (second_value - first_value));
     }
 
     void set_shape(float shp) {
@@ -44,23 +47,23 @@ private:
     float phase = 0.0f;
     float twoPI = 2.0f * M_PI;
 
-    // fast sine approximation
+    // fast cosine approximation
     float sine() {
         auto x = phase * twoPI;
         auto x2 = x * x;
-        auto numerator = -x * (-11511339840 + x2 * (1640635920 + x2 * (-52785432 + x2 * 479249)));
-        auto denominator = 11511339840 + x2 * (277920720 + x2 * (3177720 + x2 * 18361));
+        auto numerator = -(-39251520 + x2 * (18471600 + x2 * (-1075032 + 14615 * x2)));
+        auto denominator = 39251520 + x2 * (1154160 + x2 * (16632 + x2 * 127));
         return numerator / denominator;
     }
     
     float sawtooth() {
-        return (1-phase)-0.5;
+        return (phase * 2.0f) - 1.0f;
     }
     
     float square() {
         float sample;
-        if(phase >= 0.5) sample = 0.7; // 1 and -1 makes it significantly louder than the sine and saw
-        else sample = -0.7;
+        if(phase >= 0.5) sample = 1.0f; // 1 and -1 makes it significantly louder than the sine and saw
+        else sample = -1.0f;
         return sample;
     }
     
@@ -70,7 +73,8 @@ private:
         return sample;
     }
 
+    float rate;
     //Pointers to the waveshape generators
-    float (LFO::*shapePointers[4])() = {&LFO::sine, &LFO::triangle, &LFO::square, &LFO::sawtooth};
+    float (LFO::*shapePointers[4])() = {&LFO::sine, &LFO::square, &LFO::sawtooth, &LFO::triangle};
 
 };

@@ -32,13 +32,11 @@ class Parameter
         \param max - top of range (when input is 1.0)
     \param curve - the scaling curve for the input->output transformation.
     */
-    void Init(AnalogControl input, float min, float max, Curve curve);
+    void Init(float min, float max, Curve curve);
 
     /** processes the input signal, this should be called at the samplerate of the hid_ctrl passed in.
     \return  a float with the specified transformation applied.
     */
-    float Process();
-    
     float Process(float input);
 
     /** 

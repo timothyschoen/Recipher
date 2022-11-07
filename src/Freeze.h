@@ -20,7 +20,6 @@ struct Freeze
             write_en = false;
             sample_req = true;
         }
-        
     }
     
     void set_freeze_size(int grain_samples) {
