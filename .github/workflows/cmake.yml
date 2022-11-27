@@ -6,7 +6,7 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   CMAKE_BUILD_PARALLEL_LEVEL: 3
-  SETTINGS_APP_LOCATION: $SETTINGS_APP_LOCATION/app
+  SETTINGS_APP_LOCATION: ${{github.workspace}}/app
 
 jobs:
   macos-universal-build:
