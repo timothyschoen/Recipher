@@ -37,4 +37,6 @@ target_link_libraries(RecipherSettingsTool
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
         
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+add_custom_command(TARGET RecipherSettingsTool POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E tar "cfv" "archive.zip" --format=zip)
+
