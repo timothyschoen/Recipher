@@ -26,7 +26,7 @@ enum ParameterPin
     SUSTAIN,
     RELEASE,
     
-    GAIN = 25,
+    GAIN,
     FEEDBACK,
     DELAY,
     STRETCH,
@@ -48,11 +48,11 @@ constexpr Parameter::Curve Linear = Parameter::Curve::LINEAR;
 constexpr Parameter::Curve LogScale = Parameter::Curve::LOGARITHMIC;
 constexpr Parameter::Curve ExpScale = Parameter::Curve::EXPONENTIAL;
 
-using SingleParameter = std::tuple<ParameterPin, float, float, float, daisy::Parameter::Curve, std::vector<float>>;
+using SingleParameter = std::tuple<ParameterPin, float, float, float, daisy::Parameter::Curve, float>;
 
 using ParameterInit = std::vector<SingleParameter>;
 
-static inline ParameterMode parameter_mode = PICKUP;
+static inline ParameterMode parameter_mode = TOUCH;
 
 struct SculptParameter
 {
@@ -60,10 +60,9 @@ struct SculptParameter
     SculptParameter(ParameterInit init){
         
         // Get parameter pin, range, init and scaling
-        auto [pin1, min1, max1, init1, scale1, deadzones1] = init[0];
-        auto [pin2, min2, max2, init2, scale2, deadzones2] = init[1];
+        auto [pin1, min1, max1, init1, scale1, deadzone1] = init[0];
+        auto [pin2, min2, max2, init2, scale2, deadzone2] = init[1];
         
-#if !JUCE
         // Initialise ADC
         control.Init(sculpt.adc.GetPtr((int)pin1 - 15), sculpt.AudioSampleRate() / 256.0f);
         control.SetCoeff (0.5f);
@@ -79,15 +78,17 @@ struct SculptParameter
             last_value[1] = init2;
             last_value[0] = control_value;
         }
-#else
-        last_value[1] = init1;
-        last_value[0] = init2;
-        set_value = init1;
         
-#endif
+        touched_value = control_value;
         
-        deadzones[0] = deadzones1;
-        deadzones[1] = deadzones2;
+        min[0] = min1;
+        min[1] = min2;
+        
+        max[0] = max1;
+        max[1] = max2;
+        
+        deadzone[0] = deadzone1;
+        deadzone[1] = deadzone2;
         
         // Initialise Daisy control scaling
         parameters[0].Init(min1, max1, scale1);
@@ -95,7 +96,7 @@ struct SculptParameter
         
         set_fc(0.5f);
         
-        touched_value = control_value;
+
     }
     
     float process_pickup(float knob_position) {
@@ -106,14 +107,14 @@ struct SculptParameter
         // If the value hasn't been touched since the last shift change, return the last known value
         if(!touched) {
             // Return last value with scaling
-            return parameters[shift].Process(apply_deadzones(last_value[shift], shift));
+            return parameters[shift].Process(apply_deadzone(last_value[shift], shift));
         }
                     
         // If it has been touched, set last value to the current value
         last_value[shift] = knob_position;
         
         // Return the current adc value with scaling
-        return parameters[shift].Process(apply_deadzones(knob_position, shift));
+        return parameters[shift].Process(apply_deadzone(knob_position, shift));
 
     }
     
@@ -123,14 +124,14 @@ struct SculptParameter
         // If the value hasn't been touched since the last shift change, return the last known value
         if(!touched) {
             // Return last value with scaling
-            return parameters[shift].Process(apply_deadzones(last_value[shift], shift));
+            return parameters[shift].Process(apply_deadzone(last_value[shift], shift));
         }
         
         // If it has been touched, set last value to the current value
         last_value[shift] = knob_position;
         
         // Return the current adc value with scaling
-        return parameters[shift].Process(apply_deadzones(knob_position, shift));
+        return parameters[shift].Process(apply_deadzone(knob_position, shift));
     }
     
     void set_touch_value() {
@@ -143,12 +144,8 @@ struct SculptParameter
         // If the current shift is wanted, read current position
         if(wanted_shift == shift) {
             
-#if JUCE
-            float knob_position = set_value;
-#else
             // Get value scaled from 0-1 from adc
             float knob_position = control.Process();
-#endif
             
             if(parameter_mode == ParameterMode::TOUCH)
             {
@@ -162,7 +159,7 @@ struct SculptParameter
         // If the unselected shift is wanted, return the last known value
         else {
             // Return last value with scaling
-            return parameters[wanted_shift].Process(apply_deadzones(last_value[wanted_shift], wanted_shift));
+            return parameters[wanted_shift].Process(apply_deadzone(last_value[wanted_shift], wanted_shift));
         }
     }
     
@@ -181,11 +178,21 @@ struct SculptParameter
         modulation_value[shift] = mod_value;
     }
     
-    inline float apply_deadzones(float value, bool shift) {
-        for(auto& deadzone : deadzones[shift]) {
-            if(abs(value - deadzone) < deadzone_size) {
-                return std::clamp(apply_filter(deadzone, shift) + modulation_value[shift], 0.0f, 1.0f);
-            }
+    inline float apply_deadzone(float value, bool shift) {
+        
+        if(deadzone[shift] < 0.0f) {
+            return std::clamp(value + modulation_value[shift], 0.0f, 1.0f);
+        }
+        
+        if(abs(value - deadzone[shift]) < deadzone_size) {
+            return std::clamp(apply_filter(deadzone[shift], shift) + modulation_value[shift], 0.0f, 1.0f);
+        }
+        
+        if(value > deadzone[shift] + deadzone_size) {
+            value = map<float>(value, deadzone[shift] + deadzone_size, max[shift], deadzone[shift], max[shift]);
+        }
+        if(value < deadzone[shift] - deadzone_size) {
+            value = map<float>(value, min[shift], deadzone[shift] - deadzone_size, min[shift], deadzone[shift]);
         }
         
         // just to keep filter state up-to-date
@@ -201,7 +208,9 @@ struct SculptParameter
 private:
     
     Parameter parameters[2];
-    std::vector<float> deadzones[2];
+    float deadzone[2];
+    
+    float min[2], max[2];
     
     float last_value[2];
     double a0, b1, z1[2];
@@ -210,12 +219,8 @@ private:
     
     float deadzone_size = 0.03f;
     
-#if !JUCE
+
     AnalogControl control;
-#else
-public:
-    float set_value = 0;
-#endif
 };
 
 struct SculptParameters
@@ -232,13 +237,13 @@ struct SculptParameters
         sculpt_parameters = {
             SculptParameter({{MIX, 0.0f, 1.0f, 0.5f, Linear, {}},            {GAIN, 1.0f, 4.0f, 0.5f, Linear, {}}}),
             SculptParameter({{LPF_Q, 0.0f, 0.99f, 0.5f, Linear, {}},         {FEEDBACK, 0.0f, 0.99f, 0.0f, Linear, {}}}),
-            SculptParameter({{LPF_NOTE, 23.0f, 132.0f, 0.7f, Linear, {}},    {DELAY, 128.0f, (sample_rate / 2.0f), 0.1f, Linear, {}}}),
-            SculptParameter({{SHAPE, 0.0f, 3.0f, 0.75f, Linear, {}},         {STRETCH, 0.0f, 2.0f, 0.5f, Linear, {0.5f}}}),
-            SculptParameter({{Q, 1.0f, 30.0f, 0.5f, ExpScale, {}},           {DRIVE, 0.1f, 1.0f, 0.5f, Linear, {}}}),
-            SculptParameter({{OCTAVER, -1.0f, 1.0f, 0.5f, Linear, {0.5f}},   {FREEZE_SIZE, 64.0f, 8192.0f, 0.0f, ExpScale, {}}}),
+            SculptParameter({{LPF_NOTE, 23.0f, 132.0f, 0.8f, Linear, {}},    {DELAY, 128.0f, (sample_rate / 2.0f), 0.1f, Linear, {}}}),
+            SculptParameter({{SHAPE, 0.0f, 3.0f, 0.75f, Linear, {}},         {STRETCH, 0.0f, 2.0f, 0.5f, Linear, 0.5f}}),
+            SculptParameter({{Q, 1.0f, 30.0f, 0.9f, ExpScale, {}},           {DRIVE, 0.1f, 1.0f, 0.0f, Linear, {}}}),
+            SculptParameter({{OCTAVER, -1.0f, 1.0f, 0.5f, Linear, 0.5f},   {FREEZE_SIZE, 64.0f, 8192.0f, 0.0f, ExpScale, {}}}),
             SculptParameter({{ATTACK, 5.0f, 4000.0f, 0.02f, ExpScale, {}},   {LFO_SHAPE, 0.0f, 2.0f, 0.5f, Linear, {}}}),
             SculptParameter({{DECAY, 5.0f, 4000.0f, 0.4f, ExpScale, {}},     {LFO_RATE, 0.5f, 20.0f, 0.2f, Linear, {}}}),
-            SculptParameter({{SUSTAIN, 0.0f, 1.0f, 0.3f, Linear, {}},        {LFO_DEPTH, -1.0f, 1.0f, 0.5f, Linear, {0.5f}}}),
+            SculptParameter({{SUSTAIN, 0.0f, 1.0f, 0.3f, Linear, {}},        {LFO_DEPTH, -1.0f, 1.0f, 0.5f, Linear, 0.5f}}),
             SculptParameter({{RELEASE, 5.0f, 4000.0f, 0.2f, ExpScale, {}},   {LFO_DEST, 0.0f, 2.0f, 0.5f, Linear, {}}})
         };
         
@@ -279,17 +284,5 @@ struct SculptParameters
             return sculpt_parameters[(int)pin - 15].process(false);
         }
     }
-    
-#if JUCE
-    static float set_value(ParameterPin pin, float new_value) {
-        
-        if(pin >= 25)  {
-            return sculpt_parameters[(int)pin - 25].set_value = new_value;
-        }
-        else {
-            return sculpt_parameters[(int)pin - 15].set_value = new_value;
-        }
-    }
-#endif
 };
 

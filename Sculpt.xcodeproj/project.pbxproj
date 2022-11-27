@@ -12,6 +12,7 @@
 		ABEAB6D22796BFFB00F69681 /* Parameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Parameters.h; sourceTree = "<group>"; };
 		ABEAB6D32796BFFB00F69681 /* LFO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LFO.h; sourceTree = "<group>"; };
 		ABEAB6D42796BFFB00F69681 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		ABEEC3052919814E00B2CCDD /* Configuration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Configuration.h; sourceTree = "<group>"; };
 		ABF91DAF27CFB61000EFD403 /* ShapeFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShapeFilter.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -27,6 +28,7 @@
 		ABEAB6CE2796BFFB00F69681 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				ABEEC3052919814E00B2CCDD /* Configuration.h */,
 				ABF91DAF27CFB61000EFD403 /* ShapeFilter.h */,
 				ABEAB6D12796BFFB00F69681 /* Freeze.h */,
 				ABEAB6D22796BFFB00F69681 /* Parameters.h */,

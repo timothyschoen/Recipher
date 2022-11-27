@@ -1,28 +1,18 @@
-#define JUCE 0
-
-#if JUCE
-#include "../app/daisy_juce.h"
-#else
 #include "daisy_seed.h"
-#endif
 
 #include "daisysp.h"
 
-#include "Octaver.h"
 #include <chrono>
 
 // Expose samplerate and sculpt interface to headers
 using namespace daisysp;
 using namespace daisy;
 
-#if JUCE
-constexpr float sample_rate = 44100.0f;
-#else
 constexpr float sample_rate = 32000.0f;
-#endif
-
 constexpr float block_size = 256;
-constexpr int max_delay_samples = 32000;
+
+// One second of delay max
+constexpr int max_delay_samples = sample_rate;
 
 
 int active_midi_channel = 1;
@@ -33,14 +23,13 @@ DaisySeed sculpt;
 #include "Freeze.h"
 #include "Parameters.h"
 #include "LFO.h"
+#include "Octaver.h"
+#include "Configuration.h"
 
-
-#if !JUCE
 MidiUartHandler uart_midi;
 MidiUsbHandler usb_midi;
 
 Led led;
-#endif
 
 Svf filt;
 LFO lfo = LFO(sample_rate, block_size);
@@ -103,7 +92,9 @@ public:
         velocity = vel;
         timestamp = std::chrono::system_clock::now().time_since_epoch().count();
         filter.set_pitch(note);
-                
+        
+        env.Retrigger(false);
+        
         active  = true;
         envgate = true;
     }
@@ -154,7 +145,7 @@ private:
     float sustain_level;
     
     float note, velocity;
-
+    
     bool active;
     bool envgate;
     
@@ -191,9 +182,11 @@ public:
     
     void note_on(float notenumber, float velocity)
     {
-        Voice *v = find_voice(notenumber);
-        if(v == NULL)
+        auto* v = find_voice(notenumber);
+        
+        if(v == nullptr)
             return;
+        
         v->note_on(notenumber, velocity);
     }
     
@@ -358,17 +351,17 @@ ParameterPin mod_targets[3] = {ParameterPin::LPF_NOTE, ParameterPin::DELAY, Para
 void apply_lfo() {
     
     float lfo_value = lfo.tick();
-
-#if !JUCE
+    
     led.Set(lfo_value > 0.0f);
-#endif
+    led.Update();
     
     // Split modulator between sources when the knob is inbetween positions
     int first_target = lfo_destination;
     int second_target = first_target == 2 ? 0 : lfo_destination + 1;
-    float diff = lfo_destination - first_target;
     
-    float mod_1 = lfo_value * abs(lfo_depth) * (1.0f - diff);
+    float diff = first_target == 2 ? 1.0f : lfo_destination - first_target;
+    
+    float mod_1 = lfo_value * abs(lfo_depth) *  (1.0f - diff);
     float mod_2 = lfo_value * lfo_depth * diff;
     
     for(int i = ParameterPin::MIX; i <= ParameterPin::LFO_DEST; i++) {
@@ -438,12 +431,81 @@ void update_parameters() {
     lfo.set_frequency(SculptParameters::get_value(LFO_RATE));
     lfo_depth = SculptParameters::get_value(LFO_DEPTH);
     lfo_destination = SculptParameters::get_value(LFO_DEST);
-
+    
     voice_handler.update_filters();
 }
 
+
+// All types of messages we can send or receive
+enum MessageType
+{
+    Channel,
+    ToggleBehaviour,
+    LFODest,
+    Dump
+};
+
+void read_settings_messages(MidiEvent m)
+{
+    static constexpr uint8_t recipher_message_id_1 = 73;
+    static constexpr uint8_t recipher_message_id_2 = 11;
+    
+    if(m.type == SystemCommon || m.type == SystemRealTime)
+    {
+        auto sysex = m.AsSystemExclusive();
+        auto* data = sysex.data;
+        
+        if(data[0] != recipher_message_id_1 || data[1] != recipher_message_id_2) return;
+        
+        auto type = static_cast<MessageType>(data[2]);
+        
+        if(type == Channel) {
+            // set input channel
+            active_midi_channel = data[3];
+        }
+        if(type == ToggleBehaviour) {
+            
+            parameter_mode = data[3] ? TOUCH : PICKUP;
+        }
+        if(type == LFODest) {
+            auto idx = data[3];
+            auto value = data[4];
+            
+            mod_targets[idx] = static_cast<ParameterPin>(value);
+        }
+        if(type == Dump) {
+            
+            uint8_t message[16];
+            
+            message[0] = 240; // SysEx start byte
+            
+            message[1] = recipher_message_id_1; // Manufacturer IDs
+            message[2] = recipher_message_id_2;
+            
+            message[3] = MessageType::Dump; // message type
+            
+            // Dump all preferences to settings app
+            message[4] = active_midi_channel;
+            message[5] = parameter_mode;
+            
+            message[6] = static_cast<uint8_t>(mod_targets[0]);
+            message[7] = static_cast<uint8_t>(mod_targets[1]);
+            message[8] = static_cast<uint8_t>(mod_targets[2]);
+            
+            // Leave empty to expand features in the future
+            for(int i = 9; i < 15; i++) message[i] = 0;
+            
+            message[15] = 247; // SysEx end byte
+            
+            usb_midi.SendMessage(message, 16);
+        }
+        
+        write_settings(active_midi_channel, parameter_mode, static_cast<int>(mod_targets[0]),  static_cast<int>(mod_targets[1]),  static_cast<int>(mod_targets[2]));
+    }
+}
+
 // Switch case for Message Type.
-void HandleMidiMessage(MidiEvent m)
+void handle_midi_message(MidiEvent m)
 {
     if(m.channel != (active_midi_channel - 1)) return;
     
@@ -489,27 +551,24 @@ void audio_callback(const float* const* in, float** out, size_t size)
 {
     float synth_out;
     
-#if !JUCE
     uart_midi.Listen();
     while(uart_midi.HasEvents())
     {
-        HandleMidiMessage(uart_midi.PopEvent());
+        handle_midi_message(uart_midi.PopEvent());
     }
     
     usb_midi.Listen();
     while(usb_midi.HasEvents())
     {
-        HandleMidiMessage(usb_midi.PopEvent());
+        auto event = usb_midi.PopEvent();
+        handle_midi_message(event);
+        read_settings_messages(event);
     }
-
-    
-    led.Update();
-#endif
     
     apply_lfo();
     update_parameters();
     
-
+    
     for(size_t i = 0; i < size; i++)
     {
         float input = (in[0][i] * input_gain * noise_mix) + distribution(generator) * (1.0f - noise_mix);
@@ -528,7 +587,7 @@ void audio_callback(const float* const* in, float** out, size_t size)
         // Apply distortion
         float clean_out = synth_out;
         
-        synth_out = drive.Process(synth_out);
+        //synth_out = drive.Process(synth_out);
         synth_out = drive_balance.Process(synth_out, clean_out);
         
         fonepole(smooth_cutoff, lpf_cutoff + lpf_mod, 0.0005f);
@@ -538,12 +597,10 @@ void audio_callback(const float* const* in, float** out, size_t size)
         synth_out = filt.Low();
         
         // Output
-        out[0][i] = synth_out * 2.0f;
+        out[0][i] = synth_out * 1.4f;
         trig = 0.0;
     }
 }
-
-#if JUCE
 
 void init(float rate, int blocksize) {
     filt.Init(sample_rate);
@@ -564,17 +621,28 @@ void init(float rate, int blocksize) {
 }
 
 void set_parameter(int idx, float value, bool shift) {
-    int offset = shift ? 15 : 25;
+    int offset = shift ? 25 : 15;
     SculptParameters::set_value(static_cast<ParameterPin>(idx + offset), value);
     SculptParameters::set_shift(shift);
     switches[0].state = shift;
 }
-#else
 
 int main(void)
 {
     sculpt.Configure();
     sculpt.Init();
+    
+    bool load_config = init_configuration();
+    
+    if(load_config) {
+        auto settings = read_settings();
+        
+        active_midi_channel = settings[0];
+        parameter_mode = static_cast<ParameterMode>(settings[1]);
+        mod_targets[0] = static_cast<ParameterPin>(settings[2]);
+        mod_targets[1] = static_cast<ParameterPin>(settings[3]);
+        mod_targets[2] = static_cast<ParameterPin>(settings[4]);
+    }
     
     sculpt.SetAudioBlockSize(block_size);
     
@@ -622,7 +690,6 @@ int main(void)
     
     // start callback
     sculpt.StartAudio(audio_callback);
-    
     
     while(true) {
         System::Delay(250);

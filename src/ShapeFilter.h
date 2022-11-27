@@ -139,9 +139,6 @@ struct ShapeFilter
                     filtered = apply_filter(filtered, c, hr);
                     
                     if(!std::isfinite(filtered)) {
-#if JUCE
-                        assert(false);
-#endif
                         filtered = input;
                     }
                 }
