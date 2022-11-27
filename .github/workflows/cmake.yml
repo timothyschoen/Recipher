@@ -18,10 +18,10 @@ jobs:
         submodules: recursive
 
     - name: Create Build Environment
-      run: cmake -E make_directory $SETTINGS_APP_LOCATION/build        
+      run: cmake -E make_directory ${{SETTINGS_APP_LOCATION}}/build        
 
     - name: Configure CMake
-      working-directory: $SETTINGS_APP_LOCATION/build
+      working-directory: ${{SETTINGS_APP_LOCATION}}/build
       run: cmake $SETTINGS_APP_LOCATION
 
     #- name: Import Code-Signing Certificates
@@ -31,7 +31,7 @@ jobs:
     #    p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
 
     - name: Build
-      working-directory: $SETTINGS_APP_LOCATION/build
+      working-directory: ${{SETTINGS_APP_LOCATION}}/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
@@ -57,16 +57,16 @@ jobs:
         submodules: recursive
 
     - name: Create Build Environment
-      run: cmake -E make_directory $SETTINGS_APP_LOCATION/build 
+      run: cmake -E make_directory ${{SETTINGS_APP_LOCATION}}/build 
 
     - name: Configure CMake
       shell: bash
-      working-directory: $SETTINGS_APP_LOCATION/build
+      working-directory: ${{SETTINGS_APP_LOCATION}}/build
       run: cmake $SETTINGS_APP_LOCATION -G "Visual Studio 17 2022" -A x64
 
     - name: Build
       shell: bash
-      working-directory: $SETTINGS_APP_LOCATION/build
+      working-directory: ${{SETTINGS_APP_LOCATION}}/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
@@ -92,16 +92,16 @@ jobs:
         submodules: recursive
 
     - name: Create Build Environment
-      run: cmake -E make_directory $SETTINGS_APP_LOCATION/build
+      run: cmake -E make_directory ${{SETTINGS_APP_LOCATION}}/build
 
     - name: Configure CMake
       shell: bash
-      working-directory: $SETTINGS_APP_LOCATION/build
+      working-directory: ${{SETTINGS_APP_LOCATION}}/build
       run: cmake $SETTINGS_APP_LOCATION  -G "Visual Studio 17 2022" -A Win32
 
     - name: Build
       shell: bash
-      working-directory: $SETTINGS_APP_LOCATION/build
+      working-directory: ${{SETTINGS_APP_LOCATION}}/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
@@ -129,14 +129,14 @@ jobs:
       run: sudo apt -qq update && sudo apt install  -y libasound2-dev libjack-jackd2-dev libcurl4-openssl-dev libfreetype6-dev libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev mesa-common-dev
 
     - name: Create Build Environment
-      run: cmake -E make_directory $SETTINGS_APP_LOCATION/build
+      run: cmake -E make_directory ${{SETTINGS_APP_LOCATION}}/build
 
     - name: Configure CMake
-      working-directory: $SETTINGS_APP_LOCATION/build
+      working-directory: ${{SETTINGS_APP_LOCATION}}/build
       run: cmake $SETTINGS_APP_LOCATION -G "Unix Makefiles"
 
     - name: Build
-      working-directory: $SETTINGS_APP_LOCATION/build
+      working-directory: ${{SETTINGS_APP_LOCATION}}/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
@@ -164,14 +164,14 @@ jobs:
       run: sudo apt -qq update && sudo apt install  -y libasound2-dev libjack-jackd2-dev libcurl4-openssl-dev libfreetype6-dev libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev mesa-common-dev
 
     - name: Create Build Environment
-      run: cmake -E make_directory $SETTINGS_APP_LOCATION/build
+      run: cmake -E make_directory ${{SETTINGS_APP_LOCATION}}/build
 
     - name: Configure CMake
-      working-directory: $SETTINGS_APP_LOCATION/build
+      working-directory: ${{SETTINGS_APP_LOCATION}}/build
       run: cmake $SETTINGS_APP_LOCATION -G "Unix Makefiles"
 
     - name: Build
-      working-directory: $SETTINGS_APP_LOCATION/build
+      working-directory: ${{SETTINGS_APP_LOCATION}}/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
@@ -203,7 +203,7 @@ jobs:
       - name: Install Dependencies
         run: sudo dnf install -y cmake alsa-lib-devel libXinerama-devel freetype-devel libcurl-devel gcc-c++ libXcomposite-devel freeglut-devel libXrandr-devel libXcursor-devel xz
       - name: Build
-        run: mkdir build && cd build && cmake -DENABLE_TESTING=1 .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
+        run: mkdir build && cd build && cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
 
       - name: Archive Artifacts
         uses: actions/upload-artifact@v3
@@ -274,7 +274,7 @@ jobs:
       run: zypper install -y xz tar gzip cmake alsa-lib-devel libXinerama-devel freetype-devel libcurl-devel libXcomposite-devel freeglut-devel libXrandr-devel libXcursor-devel freetype2-devel gcc gcc-c++
 
     - name: Build
-      run: mkdir build && cd build && cmake -DENABLE_TESTING=1 .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
+      run: mkdir build && cd build && cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
@@ -310,7 +310,7 @@ jobs:
       run: apt install -y libasound2-dev libjack-jackd2-dev libcurl4-openssl-dev libfreetype6-dev libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev mesa-common-dev cmake make gcc g++
 
     - name: Build
-      run: mkdir build && cd build && CXX=g++ cmake -DENABLE_TESTING=1 .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
+      run: mkdir build && cd build && CXX=g++ cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
