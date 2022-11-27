@@ -1,6 +1,6 @@
 
 # Project Name
-TARGET = BandSynth
+TARGET = Recipher
 
 CPP_STANDARD = --std=gnu++17
 OPT ?= -O2
