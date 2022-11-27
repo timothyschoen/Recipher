@@ -31,7 +31,7 @@ jobs:
     #    p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
 
     - name: Build
-      working-directory: ${{}}/build
+      working-directory: $SETTINGS_APP_LOCATION/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
