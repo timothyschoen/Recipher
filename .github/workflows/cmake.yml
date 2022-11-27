@@ -6,7 +6,6 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   CMAKE_BUILD_PARALLEL_LEVEL: 3
-  SETTINGS_APP_LOCATION: ${{github.workspace}}/app
 
 jobs:
   macos-universal-build:
@@ -18,11 +17,11 @@ jobs:
         submodules: recursive
 
     - name: Create Build Environment
-      run: cmake -E make_directory ${SETTINGS_APP_LOCATION}/build        
+      run: cmake -E make_directory ${{github.workspace}}/app/build        
 
     - name: Configure CMake
-      working-directory: ${SETTINGS_APP_LOCATION}/build
-      run: cmake $SETTINGS_APP_LOCATION
+      working-directory: ${{github.workspace}}/app/build
+      run: cmake ..
 
     #- name: Import Code-Signing Certificates
     #  uses: figleafteam/import-codesign-certs@v2
@@ -31,7 +30,7 @@ jobs:
     #    p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
 
     - name: Build
-      working-directory: ${SETTINGS_APP_LOCATION}/build
+      working-directory: ${{github.workspace}}/app/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
@@ -57,16 +56,16 @@ jobs:
         submodules: recursive
 
     - name: Create Build Environment
-      run: cmake -E make_directory ${SETTINGS_APP_LOCATION}/build 
+      run: cmake -E make_directory ${{github.workspace}}/app/build 
 
     - name: Configure CMake
       shell: bash
-      working-directory: ${SETTINGS_APP_LOCATION}/build
-      run: cmake $SETTINGS_APP_LOCATION -G "Visual Studio 17 2022" -A x64
+      working-directory: ${{github.workspace}}/app/build
+      run: cmake .. -G "Visual Studio 17 2022" -A x64
 
     - name: Build
       shell: bash
-      working-directory: ${SETTINGS_APP_LOCATION}/build
+      working-directory: ${{github.workspace}}/app/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
@@ -92,16 +91,16 @@ jobs:
         submodules: recursive
 
     - name: Create Build Environment
-      run: cmake -E make_directory ${SETTINGS_APP_LOCATION}/build
+      run: cmake -E make_directory ${{github.workspace}}/app/build
 
     - name: Configure CMake
       shell: bash
-      working-directory: ${SETTINGS_APP_LOCATION}/build
-      run: cmake $SETTINGS_APP_LOCATION  -G "Visual Studio 17 2022" -A Win32
+      working-directory: ${{github.workspace}}/app/build
+      run: cmake .. -G "Visual Studio 17 2022" -A Win32
 
     - name: Build
       shell: bash
-      working-directory: ${SETTINGS_APP_LOCATION}/build
+      working-directory: ${{github.workspace}}/app/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
@@ -129,14 +128,14 @@ jobs:
       run: sudo apt -qq update && sudo apt install  -y libasound2-dev libjack-jackd2-dev libcurl4-openssl-dev libfreetype6-dev libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev mesa-common-dev
 
     - name: Create Build Environment
-      run: cmake -E make_directory ${SETTINGS_APP_LOCATION}/build
+      run: cmake -E make_directory ${{github.workspace}}/app/build
 
     - name: Configure CMake
-      working-directory: ${SETTINGS_APP_LOCATION}/build
-      run: cmake $SETTINGS_APP_LOCATION -G "Unix Makefiles"
+      working-directory: ${{github.workspace}}/app/build
+      run: cmake .. -G "Unix Makefiles"
 
     - name: Build
-      working-directory: ${SETTINGS_APP_LOCATION}/build
+      working-directory: ${{github.workspace}}/app/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
@@ -164,14 +163,14 @@ jobs:
       run: sudo apt -qq update && sudo apt install  -y libasound2-dev libjack-jackd2-dev libcurl4-openssl-dev libfreetype6-dev libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev mesa-common-dev
 
     - name: Create Build Environment
-      run: cmake -E make_directory ${SETTINGS_APP_LOCATION}/build
+      run: cmake -E make_directory ${{github.workspace}}/app/build
 
     - name: Configure CMake
-      working-directory: ${SETTINGS_APP_LOCATION}/build
-      run: cmake $SETTINGS_APP_LOCATION -G "Unix Makefiles"
+      working-directory: ${{github.workspace}}/app/build
+      run: cmake .. -G "Unix Makefiles"
 
     - name: Build
-      working-directory: ${SETTINGS_APP_LOCATION}/build
+      working-directory: ${{github.workspace}}/app/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
