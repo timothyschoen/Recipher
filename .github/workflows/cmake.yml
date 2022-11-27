@@ -35,11 +35,10 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
-      working-directory: $ARTEFACTS_PATH
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-MacOS-Universal
-        path: "./Recipher Settings Tool.app"
+        path: "$ARTEFACTS_PATH/Recipher Settings Tool.app"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -72,10 +71,9 @@ jobs:
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
-      working-directory: $ARTEFACTS_PATH
       with:
         name: RecipherSettingsTool-Win64
-        path: "./Recipher Settings Tool.exe"
+        path: "$ARTEFACTS_PATH/Recipher Settings Tool.exe"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -108,10 +106,9 @@ jobs:
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
-      working-directory: $ARTEFACTS_PATH
       with:
         name: RecipherSettingsTool-Win32
-        path: "./Recipher Settings Tool.exe"
+        path: "$ARTEFACTS_PATH/Recipher Settings Tool.exe"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -144,10 +141,9 @@ jobs:
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
-      working-directory: $ARTEFACTS_PATH
       with:
         name: RecipherSettingsTool-Ubuntu-22.04-x64
-        path: "./Recipher Settings Tool"
+        path: "$ARTEFACTS_PATH/Recipher Settings Tool"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -180,10 +176,9 @@ jobs:
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
-      working-directory: $ARTEFACTS_PATH
       with:
         name: RecipherSettingsTool-Ubuntu-20.04-x64
-        path: "./Recipher Settings Tool"
+        path: "$ARTEFACTS_PATH/Recipher Settings Tool"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -213,10 +208,9 @@ jobs:
 
       - name: Archive Artifacts
         uses: actions/upload-artifact@v3
-        working-directory: $ARTEFACTS_PATH
         with:
           name: RecipherSettingsTool-Fedora-36-x64
-          path: "./Recipher Settings Tool"
+          path: "$ARTEFACTS_PATH/Recipher Settings Tool"
 
       - name: Release Artifacts
         uses: softprops/action-gh-release@v1
@@ -250,11 +244,10 @@ jobs:
       run: mkdir build && cd build && CC=/usr/bin/gcc CXX=/usr/bin/g++ cmake -DENABLE_TESTING=1 .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
-      working-directory: $ARTEFACTS_PATH
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Arch-x64
-        path: "./Recipher Settings Tool"
+        path: "$ARTEFACTS_PATH/Recipher Settings Tool"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -289,10 +282,9 @@ jobs:
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
-      working-directory: $ARTEFACTS_PATH
       with:
         name: RecipherSettingsTool-OpenSUSE-x64
-        path: "./Recipher Settings Tool"
+        path: "$ARTEFACTS_PATH/Recipher Settings Tool"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -327,10 +319,9 @@ jobs:
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
-      working-directory: $ARTEFACTS_PATH
       with:
         name: RecipherSettingsTool-Debian-x64
-        path: "./Recipher Settings Tool"
+        path: "$ARTEFACTS_PATH/Recipher Settings Tool"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
