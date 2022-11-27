@@ -250,8 +250,8 @@ jobs:
       run: mkdir build && cd build && CC=/usr/bin/gcc CXX=/usr/bin/g++ cmake -DENABLE_TESTING=1 .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
 
     - name: Archive Artifacts
-      uses: actions/upload-artifact@v3
       working-directory: $ARTEFACTS_PATH
+      uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Arch-x64
         path: "./Recipher Settings Tool"
