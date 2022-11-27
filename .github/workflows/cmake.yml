@@ -338,4 +338,4 @@ jobs:
         submodules: recursive
 
     - name: Install Dependencies
-      run: apt install -y gcc-arm-non-eabi
+      run: sudo apt -qq update && sudo apt install -y gcc-arm-non-eabi
