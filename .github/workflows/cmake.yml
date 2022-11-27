@@ -326,7 +326,7 @@ jobs:
         draft: true
         files: RecipherSettingsTool-Debian-x64
 
-  ubuntu-22_04-build:
+  ubuntu-22_04-build-bin:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
