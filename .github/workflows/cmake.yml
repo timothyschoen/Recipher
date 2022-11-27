@@ -22,7 +22,7 @@ jobs:
 
     - name: Configure CMake
       working-directory: $SETTINGS_APP_LOCATION/build
-      run: cmake $GITHUB_WORKSPACE
+      run: cmake $SETTINGS_APP_LOCATION
 
     #- name: Import Code-Signing Certificates
     #  uses: figleafteam/import-codesign-certs@v2
@@ -62,7 +62,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: $SETTINGS_APP_LOCATION/build
-      run: cmake $GITHUB_WORKSPACE -G "Visual Studio 17 2022" -A x64
+      run: cmake $SETTINGS_APP_LOCATION -G "Visual Studio 17 2022" -A x64
 
     - name: Build
       shell: bash
@@ -97,7 +97,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: $SETTINGS_APP_LOCATION/build
-      run: cmake $GITHUB_WORKSPACE  -G "Visual Studio 17 2022" -A Win32
+      run: cmake $SETTINGS_APP_LOCATION  -G "Visual Studio 17 2022" -A Win32
 
     - name: Build
       shell: bash
@@ -133,7 +133,7 @@ jobs:
 
     - name: Configure CMake
       working-directory: $SETTINGS_APP_LOCATION/build
-      run: cmake $GITHUB_WORKSPACE -G "Unix Makefiles"
+      run: cmake $SETTINGS_APP_LOCATION -G "Unix Makefiles"
 
     - name: Build
       working-directory: $SETTINGS_APP_LOCATION/build
@@ -168,7 +168,7 @@ jobs:
 
     - name: Configure CMake
       working-directory: $SETTINGS_APP_LOCATION/build
-      run: cmake $GITHUB_WORKSPACE -G "Unix Makefiles"
+      run: cmake $SETTINGS_APP_LOCATION -G "Unix Makefiles"
 
     - name: Build
       working-directory: $SETTINGS_APP_LOCATION/build
