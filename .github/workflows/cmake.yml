@@ -109,7 +109,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Win64
-        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool.exe"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Release/Recipher Settings Tool.exe"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -144,7 +144,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Win32
-        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool.exe"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Release/Recipher Settings Tool.exe"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
