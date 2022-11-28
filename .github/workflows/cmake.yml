@@ -8,6 +8,35 @@ env:
   CMAKE_BUILD_PARALLEL_LEVEL: 3
 
 jobs:
+
+  recipher-firmware:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Install Dependencies
+      run: sudo apt -qq update && sudo apt install -y gcc-arm-none-eabi
+
+    - name: Build
+      working-directory: ${{github.workspace}}
+      run: make
+
+    - name: Archive Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Recipher-firmware
+        path: "${{github.workspace}}/build/Recipher.bin"
+
+    - name: Release Artifacts
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        prerelease: true
+        draft: true
+        files: Recipher-firmware
+
   macos-universal-build:
     runs-on: macos-latest
 
@@ -329,13 +358,3 @@ jobs:
         prerelease: true
         draft: true
         files: RecipherSettingsTool-Debian-x64
-
-  ubuntu-22_04-build-bin:
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
-
-    - name: Install Dependencies
-      run: sudo apt -qq update && sudo apt install -y gcc-arm-none-eabi
