@@ -644,7 +644,7 @@ int main(void)
     
     auto usb_config = MidiUsbHandler::Config();
     
-    usb_config.transport_config.periph = MidiUsbTransport::Config::INTERNAL;
+    usb_config.transport_config.periph = MidiUsbTransport::Config::EXTERNAL;
     usb_midi.Init(usb_config);
     
     filt.Init(sample_rate);
