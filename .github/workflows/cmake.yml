@@ -68,13 +68,13 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/app/build
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build . --config $BUILD_TYPE && rm -rf ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/JuceLibraryCode
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-MacOS-Universal
-        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool.app"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
