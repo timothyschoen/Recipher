@@ -46,7 +46,7 @@ public:
         send_message(Dump);
         
         // Start timer that will make sure the connection is maintained
-        startTimer(initialised ? 300 : 100);
+        startTimer(initialised ? 700 : 100);
         
         // Resize window
         setSize (420, 270);
@@ -146,7 +146,7 @@ public:
             repaint();
         }
         
-        startTimer(initialised ? 300 : 100);
+        startTimer(initialised ? 700 : 100);
         
         // Tell recipher to dump current parameters so we can copy them to the gui
         send_message(Dump);
