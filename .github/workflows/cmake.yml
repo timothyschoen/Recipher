@@ -184,7 +184,7 @@ jobs:
 
     - name: Create tarball
       working-directory: ${{github.workspace}}
-      run: tar -cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
+      run: tar cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
@@ -223,7 +223,7 @@ jobs:
 
     - name: Create tarball
       working-directory: ${{github.workspace}}
-      run: tar -cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
+      run: tar cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
@@ -259,7 +259,7 @@ jobs:
 
       - name: Create tarball
         working-directory: ${{github.workspace}}
-        run: tar -cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
+        run: tar cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
 
       - name: Archive Artifacts
         uses: actions/upload-artifact@v3
@@ -300,7 +300,7 @@ jobs:
 
     - name: Create tarball
       working-directory: ${{github.workspace}}
-      run: tar -cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
+      run: tar cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
@@ -341,7 +341,7 @@ jobs:
 
     - name: Create tarball
       working-directory: ${{github.workspace}}
-      run: tar -cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
+      run: tar cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
@@ -383,7 +383,7 @@ jobs:
 
     - name: Create tarball
       working-directory: ${{github.workspace}}
-      run: tar -cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
+      run: tar cvf RecipherSettingsTool.tar ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
