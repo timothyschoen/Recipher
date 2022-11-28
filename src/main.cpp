@@ -608,18 +608,15 @@ int main(void)
     sculpt.Configure();
     sculpt.Init();
     
-    bool load_config = init_configuration();
+   init_configuration();
     
-    if(load_config) {
-        auto settings = read_settings();
-        
-        active_midi_channel = settings[0];
-        parameter_mode = static_cast<ParameterMode>(settings[1]);
-        mod_targets[0] = static_cast<ParameterPin>(settings[2]);
-        mod_targets[1] = static_cast<ParameterPin>(settings[3]);
-        mod_targets[2] = static_cast<ParameterPin>(settings[4]);
-    }
-    
+    auto settings = read_settings();
+    active_midi_channel = settings[0];
+    parameter_mode = static_cast<ParameterMode>(settings[1]);
+    mod_targets[0] = static_cast<ParameterPin>(settings[2]);
+    mod_targets[1] = static_cast<ParameterPin>(settings[3]);
+    mod_targets[2] = static_cast<ParameterPin>(settings[4]);
+
     sculpt.SetAudioBlockSize(block_size);
     
     sculpt.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_32KHZ);
@@ -647,7 +644,7 @@ int main(void)
     
     auto usb_config = MidiUsbHandler::Config();
     
-    usb_config.transport_config.periph = MidiUsbTransport::Config::EXTERNAL;
+    usb_config.transport_config.periph = MidiUsbTransport::Config::INTERNAL;
     usb_midi.Init(usb_config);
     
     filt.Init(sample_rate);
