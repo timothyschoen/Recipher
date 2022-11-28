@@ -6,7 +6,6 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   CMAKE_BUILD_PARALLEL_LEVEL: 3
-  ARTEFACTS_PATH: ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts"
 
 jobs:
   macos-universal-build:
@@ -38,7 +37,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-MacOS-Universal
-        path: "$ARTEFACTS_PATH/Recipher Settings Tool.app"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool.app"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -73,7 +72,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Win64
-        path: "$ARTEFACTS_PATH/Recipher Settings Tool.exe"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool.exe"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -108,7 +107,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Win32
-        path: "$ARTEFACTS_PATH/Recipher Settings Tool.exe"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool.exe"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -143,7 +142,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Ubuntu-22.04-x64
-        path: "$ARTEFACTS_PATH/Recipher Settings Tool"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -178,7 +177,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Ubuntu-20.04-x64
-        path: "$ARTEFACTS_PATH/Recipher Settings Tool"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -210,7 +209,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: RecipherSettingsTool-Fedora-36-x64
-          path: "$ARTEFACTS_PATH/Recipher Settings Tool"
+          path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
 
       - name: Release Artifacts
         uses: softprops/action-gh-release@v1
@@ -247,7 +246,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Arch-x64
-        path: "$ARTEFACTS_PATH/Recipher Settings Tool"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -284,7 +283,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-OpenSUSE-x64
-        path: "$ARTEFACTS_PATH/Recipher Settings Tool"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -321,7 +320,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Debian-x64
-        path: "$ARTEFACTS_PATH/Recipher Settings Tool"
+        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
