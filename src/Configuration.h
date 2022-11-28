@@ -9,7 +9,7 @@ struct Configuration {
 
 Configuration* config = nullptr;
 
-std::aligned_storage<sizeof(Configuration)> DSY_SDRAM_BSS config_memory;
+std::aligned_storage<sizeof(Configuration)> DSY_QSPI_BSS config_memory;
 
 
 bool init_configuration() {
