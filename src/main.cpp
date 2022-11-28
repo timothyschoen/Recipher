@@ -602,30 +602,6 @@ void audio_callback(const float* const* in, float** out, size_t size)
     }
 }
 
-void init(float rate, int blocksize) {
-    filt.Init(sample_rate);
-    filt.SetFreq(6000.f);
-    filt.SetRes(0.6f);
-    filt.SetDrive(0.8f);
-    
-    delay.Init();
-    
-    voice_handler.init(sample_rate);
-    
-    SculptParameters::init(false);
-    
-    jassert(rate == sample_rate);
-    jassert(blocksize == block_size);
-    
-    update_parameters();
-}
-
-void set_parameter(int idx, float value, bool shift) {
-    int offset = shift ? 25 : 15;
-    SculptParameters::set_value(static_cast<ParameterPin>(idx + offset), value);
-    SculptParameters::set_shift(shift);
-    switches[0].state = shift;
-}
 
 int main(void)
 {
@@ -696,4 +672,3 @@ int main(void)
     }
     
 }
-#endif
