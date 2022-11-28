@@ -72,6 +72,9 @@ jobs:
 
     - name: Sign and Notarise
       working-directory: ${{github.workspace}}/.github/workflows
+      env:
+        AC_USERNAME: ${{ secrets.AC_USERNAME }}
+        AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
       run: ./notarise_macos.sh ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
 
     - name: Archive Artifacts
