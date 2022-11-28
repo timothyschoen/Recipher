@@ -20,11 +20,11 @@ jobs:
       run: sudo apt -qq update && sudo apt install -y gcc-arm-none-eabi
 
     - name: Build daisySP
-      working-directory: ${{github.workspace}}/lib/daisySP
+      working-directory: ${{github.workspace}}/lib/DaisySP
       run: make
 
     - name: Build libDaisy
-      working-directory: ${{github.workspace}}/lib/libDaisy
+      working-directory: ${{github.workspace}}/lib/libdaisy
       run: make
 
     - name: Build firmware
