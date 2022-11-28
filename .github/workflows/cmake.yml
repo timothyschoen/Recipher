@@ -180,7 +180,7 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/app/build
-      run: cmake --build . --config $BUILD_TYPE && rm -rf ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/JuceLibraryCode
+      run: cmake --build . --config $BUILD_TYPE && rm -rf RecipherSettingsTool_artefacts/JuceLibraryCode
 
     - name: Create tarball
       working-directory: ${{github.workspace}}
@@ -219,7 +219,7 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/app/build
-      run: cmake --build . --config $BUILD_TYPE && rm -rf ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/JuceLibraryCode
+      run: cmake --build . --config $BUILD_TYPE && rm -rf RecipherSettingsTool_artefacts/JuceLibraryCode
 
     - name: Create tarball
       working-directory: ${{github.workspace}}
@@ -255,7 +255,7 @@ jobs:
         run: sudo dnf install -y cmake alsa-lib-devel libXinerama-devel freetype-devel libcurl-devel gcc-c++ libXcomposite-devel freeglut-devel libXrandr-devel libXcursor-devel xz
       - name: Build
         working-directory: ${{github.workspace}}/app
-        run: mkdir build && cd build && cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE  && rm -rf ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/JuceLibraryCode
+        run: mkdir build && cd build && cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE  && rm -rf RecipherSettingsTool_artefacts/JuceLibraryCode
 
       - name: Create tarball
         working-directory: ${{github.workspace}}
@@ -296,7 +296,7 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/app
-      run: mkdir build && cd build && CC=/usr/bin/gcc CXX=/usr/bin/g++ cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE && rm -rf ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/JuceLibraryCode
+      run: mkdir build && cd build && CC=/usr/bin/gcc CXX=/usr/bin/g++ cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE && rm -rf RecipherSettingsTool_artefacts/JuceLibraryCode
 
     - name: Create tarball
       working-directory: ${{github.workspace}}
@@ -337,7 +337,7 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/app
-      run: mkdir build && cd build && cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE && rm -rf ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/JuceLibraryCode
+      run: mkdir build && cd build && cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE && rm -rf RecipherSettingsTool_artefacts/JuceLibraryCode
 
     - name: Create tarball
       working-directory: ${{github.workspace}}
@@ -379,7 +379,7 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/app
-      run: mkdir build && cd build && CXX=g++ cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE && rm -rf ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/JuceLibraryCode
+      run: mkdir build && cd build && CXX=g++ cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE && rm -rf RecipherSettingsTool_artefacts/JuceLibraryCode
 
     - name: Create tarball
       working-directory: ${{github.workspace}}
