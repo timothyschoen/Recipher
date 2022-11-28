@@ -60,15 +60,19 @@ jobs:
       working-directory: ${{github.workspace}}/app/build
       run: cmake ..
 
-    #- name: Import Code-Signing Certificates
-    #  uses: figleafteam/import-codesign-certs@v2
-    #  with: 
-    #    p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
-    #    p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
+    - name: Import Code-Signing Certificates
+      uses: figleafteam/import-codesign-certs@v2
+      with: 
+        p12-file-base64: ${{ secrets.P12_BASE64 }}
+        p12-password: ${{ secrets.P12_PASSWORD }}
 
     - name: Build
       working-directory: ${{github.workspace}}/app/build
       run: cmake --build . --config $BUILD_TYPE && rm -rf ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/JuceLibraryCode
+
+    - name: Sign and Notarise
+      working-directory: ${{github.workspace}}/.github/workflows
+      run: ./notarise_macos.sh ${{github.workspace}}/app/build/RecipherSettingsTool_artefacts
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
@@ -175,11 +179,15 @@ jobs:
       working-directory: ${{github.workspace}}/app/build
       run: cmake --build . --config $BUILD_TYPE
 
+    - name: Create tarball
+      working-directory: ${{github.workspace}}
+      run: tar -cvf RecipherSettingsTool.tar  "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Ubuntu-22.04-x64
-        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+        path: ${{github.workspace}}/RecipherSettingsTool.tar
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -210,11 +218,15 @@ jobs:
       working-directory: ${{github.workspace}}/app/build
       run: cmake --build . --config $BUILD_TYPE
 
+    - name: Create tarball
+      working-directory: ${{github.workspace}}
+      run: tar -cvf RecipherSettingsTool.tar  "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Ubuntu-20.04-x64
-        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+        path: ${{github.workspace}}/RecipherSettingsTool.tar
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -242,11 +254,15 @@ jobs:
         working-directory: ${{github.workspace}}/app
         run: mkdir build && cd build && cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
 
+      - name: Create tarball
+        working-directory: ${{github.workspace}}
+        run: tar -cvf RecipherSettingsTool.tar  "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+
       - name: Archive Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: RecipherSettingsTool-Fedora-36-x64
-          path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+          path: ${{github.workspace}}/RecipherSettingsTool.tar
 
       - name: Release Artifacts
         uses: softprops/action-gh-release@v1
@@ -279,11 +295,15 @@ jobs:
       working-directory: ${{github.workspace}}/app
       run: mkdir build && cd build && CC=/usr/bin/gcc CXX=/usr/bin/g++ cmake -DENABLE_TESTING=1 .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
 
+    - name: Create tarball
+      working-directory: ${{github.workspace}}
+      run: tar -cvf RecipherSettingsTool.tar  "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Arch-x64
-        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+        path: ${{github.workspace}}/RecipherSettingsTool.tar
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -316,11 +336,15 @@ jobs:
       working-directory: ${{github.workspace}}/app
       run: mkdir build && cd build && cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
 
+    - name: Create tarball
+      working-directory: ${{github.workspace}}
+      run: tar -cvf RecipherSettingsTool.tar  "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-OpenSUSE-x64
-        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+        path: ${{github.workspace}}/RecipherSettingsTool.tar
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
@@ -329,6 +353,7 @@ jobs:
         prerelease: true
         draft: true
         files: RecipherSettingsTool-OpenSUSE-x64
+
   debian-build:
     runs-on: ubuntu-latest
     container:
@@ -353,11 +378,15 @@ jobs:
       working-directory: ${{github.workspace}}/app
       run: mkdir build && cd build && CXX=g++ cmake .. -G "Unix Makefiles" && cmake --build . --config $BUILD_TYPE
 
+    - name: Create tarball
+      working-directory: ${{github.workspace}}
+      run: tar -cvf RecipherSettingsTool.tar  "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+
     - name: Archive Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RecipherSettingsTool-Debian-x64
-        path: "${{github.workspace}}/app/build/RecipherSettingsTool_artefacts/Recipher Settings Tool"
+        path: ${{github.workspace}}/RecipherSettingsTool.tar
 
     - name: Release Artifacts
       uses: softprops/action-gh-release@v1
