@@ -19,12 +19,12 @@ jobs:
     - name: Install Dependencies
       run: sudo apt -qq update && sudo apt install -y gcc-arm-none-eabi
 
-    - name: Build libDaisy
-      working-directory: ${{github.workspace}}/lib/libDaisy
-      run: make
-
     - name: Build daisySP
       working-directory: ${{github.workspace}}/lib/daisySP
+      run: make
+
+    - name: Build libDaisy
+      working-directory: ${{github.workspace}}/lib/libDaisy
       run: make
 
     - name: Build firmware
