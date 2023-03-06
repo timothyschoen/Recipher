@@ -14,7 +14,6 @@ constexpr float block_size = 256;
 // One second of delay max
 constexpr int max_delay_samples = sample_rate;
 
-
 int active_midi_channel = 1;
 
 DaisySeed sculpt;
@@ -587,7 +586,7 @@ void audio_callback(const float* const* in, float** out, size_t size)
         // Apply distortion
         float clean_out = synth_out;
         
-        //synth_out = drive.Process(synth_out);
+        synth_out = drive.Process(synth_out);
         synth_out = drive_balance.Process(synth_out, clean_out);
         
         fonepole(smooth_cutoff, lpf_cutoff + lpf_mod, 0.0005f);
